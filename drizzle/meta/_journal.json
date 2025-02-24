@@ -8,6 +8,41 @@
       "when": 1740400418654,
       "tag": "0000_freezing_wolfpack",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1740408957981,
+      "tag": "0001_furry_morlocks",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1740409614074,
+      "tag": "0002_vengeful_revanche",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1740409744842,
+      "tag": "0003_lowly_lady_vermin",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1740409918046,
+      "tag": "0004_cuddly_nemesis",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1740410401223,
+      "tag": "0005_friendly_anthem",
+      "breakpoints": true
     }
   ]
 }

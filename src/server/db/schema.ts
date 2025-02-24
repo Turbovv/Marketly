@@ -65,6 +65,16 @@ export const products = createTable("products", {
     .notNull(),
 });
 
+export const cart = createTable("cart", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").references(() => users.id, { onDelete: "cascade" }),
+  productId: integer("product_id").references(() => products.id, { onDelete: "cascade" }),
+  quantity: integer("quantity").default(1),
+  price: numeric("price", { precision: 10, scale: 2 }).notNull(),
+  desc: varchar("desc", { length: 500 }).notNull(),
+  url: varchar("url", { length: 500 }).notNull(),
+});
+
 
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
@@ -101,6 +111,9 @@ export const accounts = createTable(
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
   user: one(users, { fields: [accounts.userId], references: [users.id] }),
+}));
+export const cartRelations = relations(cart, ({ one }) => ({
+  product: one(products, { fields: [cart.productId], references: [products.id] }),
 }));
 
 export const sessions = createTable(
