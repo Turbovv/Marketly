@@ -12,7 +12,7 @@ export default function ProductList() {
     <div className="grid grid-cols-3 gap-4 p-4">
       {products.map((product: any) => (
         <div key={product.id} className="border p-4 rounded">
-          <img src={product.imageUrl} alt={product.name} className="w-full h-40 object-cover" />
+          <img src={product.url} alt={product.name} className="w-full object-cover" />
           <h2 className="text-lg font-semibold">{product.name}</h2>
           <p className="text-gray-500">${product.price}</p>
         </div>
