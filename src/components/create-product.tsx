@@ -23,12 +23,16 @@ export default function CreateProductPage() {
         imageUrls,
         desc,
         price: parseFloat(price.toString()),
-        url: imageUrls[0] || "", // Assuming the first image URL as the main URL
+        url: imageUrls[0] || "",
       });
       router.push("/");
     } catch (error) {
       console.error("Error creating product:", error);
     }
+  };
+
+  const removeImage = (index: number) => {
+    setImageUrls((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -84,6 +88,12 @@ export default function CreateProductPage() {
           <div className="flex flex-wrap gap-4">
             {imageUrls.map((url, index) => (
               <div key={index} className="relative">
+                <button
+                  onClick={() => removeImage(index)}
+                  className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                >
+                  X
+                </button>
                 <img src={url} className="w-full rounded-lg" />
               </div>
             ))}
@@ -92,7 +102,7 @@ export default function CreateProductPage() {
 
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white p-2 rounded"
+          className="w-full bg-blue-500 text-white p-2 rounded mt-4"
         >
           Add Product
         </button>
