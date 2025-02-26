@@ -60,6 +60,7 @@ export const products = createTable("products", {
     url: varchar("url", { length: 500 }).notNull(),
     desc: varchar("desc", { length: 500 }).notNull(),
     price: numeric("price", { precision: 10, scale: 2 }).notNull(),
+    imageUrls: varchar("image_url", { length: 500 }),
     createdAt: timestamp("created_at", { withTimezone: true })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),

@@ -14,6 +14,7 @@ export const productsRouter = createTRPCRouter({
       url: z.string(),
       desc: z.string(),
       price: z.number(),
+      imageUrls: z.array(z.string())
     })
   )
   .mutation(async ({ input, ctx }) => {
@@ -22,6 +23,7 @@ export const productsRouter = createTRPCRouter({
       url: input.url,
       desc: input.desc,
       price: input.price.toString(), 
+      imageUrls: input.imageUrls.join(",")
     });
   }),
   getProductId: publicProcedure

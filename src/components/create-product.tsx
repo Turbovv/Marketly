@@ -3,13 +3,14 @@
 import { useState } from "react";
 import { api } from "~/trpc/react";
 import { useRouter } from "next/navigation";
+import UploadThing from "./upload-thing";
 
 export default function CreateProductPage() {
   const [name, setName] = useState("");
-  const [url, setUrl] = useState("");
   const [desc, setDesc] = useState("");
   const [price, setPrice] = useState(0);
-  
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
+
   const { mutateAsync } = api.products.createProduct.useMutation();
   const router = useRouter();
 
@@ -19,9 +20,10 @@ export default function CreateProductPage() {
     try {
       await mutateAsync({
         name,
-        url,
+        imageUrls,
         desc,
         price: parseFloat(price.toString()),
+        url: imageUrls[0] || "", // Assuming the first image URL as the main URL
       });
       router.push("/");
     } catch (error) {
@@ -43,16 +45,7 @@ export default function CreateProductPage() {
             required
           />
         </div>
-        <div className="mb-4">
-          <label className="block mb-2">Product URL</label>
-          <input
-            type="text"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded"
-            required
-          />
-        </div>
+
         <div className="mb-4">
           <label className="block mb-2">Description</label>
           <textarea
@@ -63,6 +56,7 @@ export default function CreateProductPage() {
             required
           />
         </div>
+
         <div className="mb-4">
           <label className="block mb-2">Price</label>
           <input
@@ -75,6 +69,27 @@ export default function CreateProductPage() {
             min="0"
           />
         </div>
+
+        <div className="mb-4">
+          <label className="block mb-2">Upload Product Image</label>
+          <UploadThing
+            onUploadComplete={(files) => {
+              setImageUrls((prev) => [...prev, ...files.map((file) => file.url)]);
+            }}
+            onUploadError={(error) => alert(error.message)}
+          />
+        </div>
+
+        {imageUrls.length > 0 && (
+          <div className="flex flex-wrap gap-4">
+            {imageUrls.map((url, index) => (
+              <div key={index} className="relative">
+                <img src={url} className="w-full rounded-lg" />
+              </div>
+            ))}
+          </div>
+        )}
+
         <button
           type="submit"
           className="w-full bg-blue-500 text-white p-2 rounded"

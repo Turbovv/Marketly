@@ -43,6 +43,13 @@
       "when": 1740410401223,
       "tag": "0005_friendly_anthem",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1740582232959,
+      "tag": "0006_petite_pet_avengers",
+      "breakpoints": true
     }
   ]
 }
