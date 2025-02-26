@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { products } from "~/server/db/schema";
+import { ilike } from "drizzle-orm";
 
 export const productsRouter = createTRPCRouter({
   getProducts: publicProcedure.query(async ({ ctx }) => {
@@ -42,5 +43,12 @@ export const productsRouter = createTRPCRouter({
     }
 
     return product;
+  }),
+  searchProducts: publicProcedure
+  .input(z.object({ query: z.string() }))
+  .query(async ({ ctx, input }) => {
+    return await ctx.db.query.products.findMany({
+      where: ilike(products.name, `%${input.query}%`),
+    });
   }),
 });
