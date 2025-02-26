@@ -59,4 +59,11 @@ export const cartRouter = createTRPCRouter({
       await ctx.db.delete(cart).where(eq(cart.id, input.cartId));
       return { success: true };
     }),
+    getCartCount: protectedProcedure.query(async ({ ctx }) => {
+      const count = await ctx.db.query.cart.findMany({
+        where: eq(cart.userId, ctx.session.user.id),
+      });
+    
+      return count.length;
+    }),
 });
