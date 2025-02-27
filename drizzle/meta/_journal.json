@@ -50,6 +50,20 @@
       "when": 1740582232959,
       "tag": "0006_petite_pet_avengers",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1740658962988,
+      "tag": "0007_normal_iron_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1740661468418,
+      "tag": "0008_neat_jetstream",
+      "breakpoints": true
     }
   ]
 }

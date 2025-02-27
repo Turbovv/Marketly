@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
+import SimilarProducts from "~/components/similar-products";
 import { api } from "~/trpc/react";
 
 export default function ProductDetailsPage() {
@@ -47,16 +48,13 @@ export default function ProductDetailsPage() {
             Add to Cart
           </button>
         </div>
-
-        {/* <div className="mt-6 p-4 border rounded-lg">
-          <h3 className="text-xl font-semibold">Seller Information</h3>
-          <p className="text-gray-600">John Doe</p>
-          <p className="text-gray-600">Tbilisi, Georgia</p>
-          <button className="mt-2 bg-gray-200 text-gray-800 px-4 py-2 rounded-lg">
-            Contact Seller
-          </button>
-        </div> */}
       </div>
+
+      {product?.category && (
+        <div className="md:col-span-2">
+          <SimilarProducts category={product.category} productId={product.id} />
+        </div>
+      )}
     </div>
   );
 }

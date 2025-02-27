@@ -1,0 +1,1 @@
+ALTER TABLE "mymarket_products" ADD COLUMN "subcategory" varchar(255);

@@ -9,10 +9,19 @@ export default function CreateProductPage() {
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
   const [price, setPrice] = useState(0);
+  const [category, setCategory] = useState("");
+  const [subcategory, setSubCategory] = useState("");
   const [imageUrls, setImageUrls] = useState<string[]>([]);
 
   const { mutateAsync } = api.products.createProduct.useMutation();
   const router = useRouter();
+
+  const categoryOptions: Record<string, string[]> = {
+    Technic: ["Notebook", "Computers", "Game Consoles"],
+    Music: ["Guitars", "Pianos", "Drums"],
+    "Beauty and Fashion": ["Makeup", "Skincare", "Hair Products"],
+    "Children's Products": ["Toys", "Clothing", "Accessories"],
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,6 +32,8 @@ export default function CreateProductPage() {
         imageUrls,
         desc,
         price: parseFloat(price.toString()),
+        category,
+        subcategory,
         url: imageUrls[0] || "",
       });
       router.push("/");
@@ -33,6 +44,16 @@ export default function CreateProductPage() {
 
   const removeImage = (index: number) => {
     setImageUrls((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedCategory = e.target.value;
+    setCategory(selectedCategory);
+    setSubCategory("");
+  };
+
+  const handleSubCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSubCategory(e.target.value);
   };
 
   return (
@@ -73,6 +94,42 @@ export default function CreateProductPage() {
             min="0"
           />
         </div>
+
+        <div className="mb-4">
+          <label className="block mb-2">Category</label>
+          <select
+            value={category}
+            onChange={handleCategoryChange}
+            className="w-full p-2 border border-gray-300 rounded bg-white"
+            required
+          >
+            <option value="" disabled>Select a category</option>
+            <option value="Technic">Technic</option>
+            <option value="Music">Music</option>
+            <option value="Beauty and Fashion">Beauty and Fashion</option>
+            <option value="Children's Products">Children's Products</option>
+          </select>
+        </div>
+
+        {category && (
+          <div className="mb-4">
+            <label className="block mb-2">Choose a Subcategory</label>
+            <select
+              value={subcategory}
+              onChange={handleSubCategoryChange}
+              className="w-full p-2 border border-gray-300 rounded bg-white"
+              required
+            >
+              <option value="" disabled>Select a subcategory</option>
+
+              {categoryOptions[category]?.map((option, index) => (
+                <option key={index} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <div className="mb-4">
           <label className="block mb-2">Upload Product Image</label>

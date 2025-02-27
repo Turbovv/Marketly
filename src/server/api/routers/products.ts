@@ -1,8 +1,9 @@
-import { eq } from "drizzle-orm";
+import { eq, ne } from "drizzle-orm";
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { products } from "~/server/db/schema";
-import { ilike } from "drizzle-orm";
+import { ilike, and } from "drizzle-orm";
+import { db } from "~/server/db";
 
 export const productsRouter = createTRPCRouter({
   getProducts: publicProcedure.query(async ({ ctx }) => {
@@ -15,7 +16,9 @@ export const productsRouter = createTRPCRouter({
       url: z.string(),
       desc: z.string(),
       price: z.number(),
-      imageUrls: z.array(z.string())
+      imageUrls: z.array(z.string()),
+      category: z.string(),
+      subcategory: z.string().optional(),
     })
   )
   .mutation(async ({ input, ctx }) => {
@@ -24,9 +27,20 @@ export const productsRouter = createTRPCRouter({
       url: input.url,
       desc: input.desc,
       price: input.price.toString(), 
-      imageUrls: input.imageUrls.join(",")
+      imageUrls: input.imageUrls.join(","),
+      category: input.category.toString(),
+      subcategory: input.subcategory || null,
     });
   }),
+  similarProducts: publicProcedure
+    .input(z.object({ category: z.string(), productId: z.number() }))
+    .query(async ({ input }) => {
+      return await db
+        .select()
+        .from(products)
+        .where(and(eq(products.category, input.category), ne(products.id, input.productId)))
+        .limit(4);
+    }),
   getProductId: publicProcedure
   .input(
     z.object({

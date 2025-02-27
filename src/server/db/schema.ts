@@ -61,6 +61,8 @@ export const products = createTable("products", {
     desc: varchar("desc", { length: 500 }).notNull(),
     price: numeric("price", { precision: 10, scale: 2 }).notNull(),
     imageUrls: varchar("image_url", { length: 500 }),
+    category: varchar("category", { length: 255 }).notNull(),
+    subcategory: varchar("subcategory", { length: 255 }), 
     createdAt: timestamp("created_at", { withTimezone: true })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
