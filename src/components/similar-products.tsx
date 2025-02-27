@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { ClipLoader } from "react-spinners";
 import { api } from "~/trpc/react";
 
@@ -19,9 +20,11 @@ export default function SimilarProducts({ category, productId }: SimilarProducts
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {similarProducts.map((product: any) => (
           <div key={product.id} className="border rounded p-4">
+            <Link href={`/products/${product.id}`}>
             <img src={product.url} alt={product.name} className="w-full h-40 object-cover rounded-md" />
             <h3 className="text-lg font-medium mt-2">{product.name}</h3>
             <p className="text-gray-500">${product.price}</p>
+            </Link>
           </div>
         ))}
       </div>

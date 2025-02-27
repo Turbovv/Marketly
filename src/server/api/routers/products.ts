@@ -19,6 +19,7 @@ export const productsRouter = createTRPCRouter({
       imageUrls: z.array(z.string()),
       category: z.string(),
       subcategory: z.string().optional(),
+      createdById: z.string(),
     })
   )
   .mutation(async ({ input, ctx }) => {
@@ -30,6 +31,7 @@ export const productsRouter = createTRPCRouter({
       imageUrls: input.imageUrls.join(","),
       category: input.category.toString(),
       subcategory: input.subcategory || null,
+      createdById: input.createdById,
     });
   }),
   similarProducts: publicProcedure
@@ -42,22 +44,23 @@ export const productsRouter = createTRPCRouter({
         .limit(4);
     }),
   getProductId: publicProcedure
-  .input(
-    z.object({
-      id: z.number(),
-    })
-  )
-  .query(async ({ ctx, input }) => {
-    const product = await ctx.db.query.products.findFirst({
-      where: eq(products.id, input.id),
+  .input(z.object({ id: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const product = await ctx.db.query.products.findFirst({
+        where: eq(products.id, input.id),
+        with: {
+          createdBy: true,
+        },
     });
-
     if (!product) {
       throw new Error("Product not found");
     }
 
-    return product;
-  }),
+    return {
+        ...product,
+        imageUrls: product.imageUrls ? product.imageUrls.split(",") : [],
+      };
+    }),
   searchProducts: publicProcedure
   .input(z.object({ query: z.string() }))
   .query(async ({ ctx, input }) => {

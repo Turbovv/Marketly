@@ -63,10 +63,17 @@ export const products = createTable("products", {
     imageUrls: varchar("image_url", { length: 500 }),
     category: varchar("category", { length: 255 }).notNull(),
     subcategory: varchar("subcategory", { length: 255 }), 
+    createdById: varchar("created_by_id", { length: 255 })
+    .notNull()
+    .references(() => users.id),
     createdAt: timestamp("created_at", { withTimezone: true })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
 });
+
+export const productsRelations = relations(products, ({ one }) => ({
+  createdBy: one(users, { fields: [products.createdById], references: [users.id] }),
+}));
 
 export const cart = createTable("cart", {
   id: text("id").primaryKey(),

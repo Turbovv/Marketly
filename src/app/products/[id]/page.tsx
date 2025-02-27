@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
 import SimilarProducts from "~/components/similar-products";
 import { api } from "~/trpc/react";
 
@@ -22,21 +23,45 @@ export default function ProductDetailsPage() {
     },
   });
 
+  const [mainImage, setMainImage] = useState<string | null>(null);
+
   if (!id || isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading product: {error.message}</div>;
 
   return (
     <div className="container mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-      <div className="border rounded-lg overflow-hidden">
-        <img src={product?.url} alt={product?.name} className="w-full h-auto object-cover" />
+      <div className="space-y-4">
+        {product && (
+          <div className="border rounded-lg overflow-hidden">
+            <img
+              src={mainImage || product.url}
+              alt={product.name}
+              className="w-full h-[400px] object-cover"
+            />
+          </div>
+        )}
+
+        {product && product.imageUrls.length > 0 && (
+          <div className="flex gap-2 overflow-x-auto">
+            {[product.url, ...product.imageUrls].map((image, index) => (
+              <div
+                key={index}
+                className="border rounded-lg overflow-hidden cursor-pointer hover:opacity-75 transition"
+                onClick={() => setMainImage(image)}
+              >
+                <img src={image} alt={`Thumbnail ${index + 1}`} className="w-24 h-24 object-cover" />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="space-y-4">
-        <h1 className="text-3xl font-bold text-gray-900">{product?.name}</h1>
-        <p className="text-lg text-gray-600">{product?.desc}</p>
+        <p className="text-lg text-gray-600">{product && product.desc}</p>
 
         <div className="flex items-center justify-between">
-          <span className="text-2xl font-bold text-blue-600">${product?.price}</span>
+          <span className="text-2xl font-bold text-blue-600">${product && product.price}</span>
+          <p className="text-black">{product && product.createdBy?.name}</p>
           <button
             onClick={() => {
               if (product) {
@@ -50,7 +75,7 @@ export default function ProductDetailsPage() {
         </div>
       </div>
 
-      {product?.category && (
+      {product && product.category && (
         <div className="md:col-span-2">
           <SimilarProducts category={product.category} productId={product.id} />
         </div>

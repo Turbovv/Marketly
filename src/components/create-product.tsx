@@ -1,5 +1,5 @@
 "use client";
-
+import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { api } from "~/trpc/react";
 import { useRouter } from "next/navigation";
@@ -12,6 +12,7 @@ export default function CreateProductPage() {
   const [category, setCategory] = useState("");
   const [subcategory, setSubCategory] = useState("");
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const { data: session } = useSession();
 
   const { mutateAsync } = api.products.createProduct.useMutation();
   const router = useRouter();
@@ -26,6 +27,10 @@ export default function CreateProductPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!session) {
+      console.error("User session is not available.");
+      return;
+    }
     try {
       await mutateAsync({
         name,
@@ -35,6 +40,7 @@ export default function CreateProductPage() {
         category,
         subcategory,
         url: imageUrls[0] || "",
+        createdById: session.user.id,
       });
       router.push("/");
     } catch (error) {
