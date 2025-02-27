@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { X } from "lucide-react";
 
 export default function SearchBar() {
   const [query, setQuery] = useState("");
@@ -73,10 +74,10 @@ export default function SearchBar() {
           <p className="font-semibold">Recent Searches:</p>
           <div className="grid">
             {recentSearches.map((term, idx) => (
-              <div key={idx} className="flex items-center space-x-2">
+              <div key={idx} className="flex items-center space-y-2">
                 <span
                   onClick={() => handleRecentSearchClick(term)}
-                  className="cursor-pointer text-blue-600 underline"
+                  className="cursor-pointer text-blue-600 underline w-full"
                 >
                   {term}
                 </span>
@@ -87,7 +88,7 @@ export default function SearchBar() {
                   }}
                   className="text-red-600 hover:text-red-800"
                 >
-                  X
+                  <X className="text-black" />
                 </button>
               </div>
             ))}
