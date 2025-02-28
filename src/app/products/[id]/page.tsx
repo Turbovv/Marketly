@@ -23,10 +23,30 @@ export default function ProductDetailsPage() {
     },
   });
 
+  const { data: conversations, isLoading: isLoadingConversations } = api.chat.getConversations.useQuery(
+    undefined,
+    {
+      enabled: !!product,
+    }
+  );
+
+  const { mutate: createConversation } = api.chat.createConversation.useMutation({
+    onSuccess: (conversation: { id: number; createdAt: Date; buyerId: string; sellerId: string; }[]) => {
+      if (conversation && conversation[0]) {
+        router.push(`/chat?conversationId=${conversation[0].id}`);
+      }
+    },
+
+  });
+
   const [mainImage, setMainImage] = useState<string | null>(null);
 
   if (!id || isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading product: {error.message}</div>;
+
+  const existingConversation = conversations?.find(
+    (conv) => conv.sellerId === product?.createdById
+  );
 
   return (
     <div className="container mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -74,6 +94,21 @@ export default function ProductDetailsPage() {
           </button>
         </div>
       </div>
+
+      <button
+        onClick={() => {
+          if (product) {
+            if (existingConversation) {
+              router.push(`/chat?conversationId=${existingConversation.id}`);
+            } else {
+              createConversation({ sellerId: product.createdById });
+            }
+          }
+        }}
+        className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md"
+      >
+        Contact Seller
+      </button>
 
       {product && product.category && (
         <div className="md:col-span-2">

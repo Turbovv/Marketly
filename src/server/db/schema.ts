@@ -149,6 +149,21 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
   user: one(users, { fields: [sessions.userId], references: [users.id] }),
 }));
 
+export const conversations = createTable("conversations", {
+  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+  buyerId: varchar("buyer_id", { length: 255 }).notNull().references(() => users.id),
+  sellerId: varchar("seller_id", { length: 255 }).notNull().references(() => users.id),
+  createdAt: timestamp("created_at", { withTimezone: true }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
+
+export const messages = createTable("messages", {
+  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+  conversationId: integer("conversation_id").notNull().references(() => conversations.id),
+  senderId: varchar("sender_id", { length: 255 }).notNull().references(() => users.id),
+  content: varchar("content", { length: 1000 }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
+
 export const verificationTokens = createTable(
   "verification_token",
   {
