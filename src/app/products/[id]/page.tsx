@@ -1,10 +1,10 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
 import SimilarProducts from "~/components/similar-products";
 import { api } from "~/trpc/react";
 import { useSession } from "next-auth/react";
+import ProductImageCarousel from "~/components/image-carousel";
 
 export default function ProductDetailsPage() {
   const { id } = useParams();
@@ -13,9 +13,7 @@ export default function ProductDetailsPage() {
 
   const { data: product, isLoading, error } = api.products.getProductId.useQuery(
     { id: productId as number },
-    {
-      enabled: !!productId,
-    }
+    { enabled: !!productId }
   );
 
   const addToCartMutation = api.cart.addToCart.useMutation({
@@ -24,100 +22,71 @@ export default function ProductDetailsPage() {
     },
   });
 
-  const { data: conversations, isLoading: isLoadingConversations } = api.chat.getConversations.useQuery(
-    undefined,
-    {
-      enabled: !!product,
-    }
-  );
+  const { data: conversations } = api.chat.getConversations.useQuery(undefined, {
+    enabled: !!product,
+  });
 
   const { mutate: createConversation } = api.chat.createConversation.useMutation({
-    onSuccess: (conversation: { id: number; createdAt: Date; buyerId: string; sellerId: string; }[]) => {
+    onSuccess: (conversation: { id: number }[]) => {
       if (conversation && conversation[0]) {
         router.push(`/chat?conversationId=${conversation[0].id}`);
       }
     },
-
   });
 
   const { data: session } = useSession();
-  const [mainImage, setMainImage] = useState<string | null>(null);
 
   if (!id || isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading product: {error.message}</div>;
 
-  const existingConversation = conversations?.find(
-    (conv) => conv.sellerId === product?.createdById
-  );
-
+  const images = product ? [product.url, ...product.imageUrls] : [];
+  const existingConversation = conversations?.find((conv) => conv.sellerId === product?.createdById);
   const isSeller = session?.user.id === product?.createdById;
 
   return (
-    <div className="container mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div className="container mx-auto p-8 grid grid-cols-1 md:grid-cols-2 gap-12">
       <div className="space-y-4">
-        {product && (
-          <div className="border rounded-lg overflow-hidden">
-            <img
-              src={mainImage || product.url}
-              alt={product.name}
-              className="w-full h-[400px] object-cover"
-            />
-          </div>
-        )}
-
-        {product && product.imageUrls.length > 0 && (
-          <div className="flex gap-2 overflow-x-auto">
-            {[product.url, ...product.imageUrls].map((image, index) => (
-              <div
-                key={index}
-                className="border rounded-lg overflow-hidden cursor-pointer hover:opacity-75 transition"
-                onClick={() => setMainImage(image)}
-              >
-                <img src={image} alt={`Thumbnail ${index + 1}`} className="w-24 h-24 object-cover" />
-              </div>
-            ))}
-          </div>
-        )}
+        {product && <ProductImageCarousel images={images} />}
       </div>
 
-      <div className="space-y-4">
-        <p className="text-lg text-gray-600">{product && product.desc}</p>
+      <div className="space-y-6">
+        <h2 className="text-3xl font-semibold text-gray-900">{product?.name}</h2>
+        <p className="text-lg text-gray-600">{product?.desc}</p>
 
-        <div className="flex items-center justify-between">
-          <span className="text-2xl font-bold text-blue-600">${product && product.price}</span>
-          <p className="text-black">{product && product.createdBy?.name}</p>
+        <div className="flex items-center justify-between mt-4">
+          <span className="text-3xl font-semibold text-blue-600">${product?.price}</span>
+          <p className="text-gray-800 text-lg">{product?.createdBy?.name}</p>
+        </div>
+
+        <div className="flex gap-4 mt-6">
           <button
-            onClick={() => {
-              if (product) {
-                addToCartMutation.mutate({ productId: product.id, quantity: 1 });
-              }
-            }}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+            onClick={() => product && addToCartMutation.mutate({ productId: product.id, quantity: 1 })}
+            className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition w-full md:w-auto"
           >
             Add to Cart
           </button>
+
+          {!isSeller && (
+            <button
+              onClick={() => {
+                if (product) {
+                  if (existingConversation) {
+                    router.push(`/chat?conversationId=${existingConversation.id}`);
+                  } else {
+                    createConversation({ sellerId: product.createdById });
+                  }
+                }
+              }}
+              className="bg-gray-800 text-white px-6 py-3 rounded-md hover:bg-gray-700 transition w-full md:w-auto"
+            >
+              Contact Seller
+            </button>
+          )}
         </div>
       </div>
 
-      {!isSeller && (
-        <button
-          onClick={() => {
-            if (product) {
-              if (existingConversation) {
-                router.push(`/chat?conversationId=${existingConversation.id}`);
-              } else {
-                createConversation({ sellerId: product.createdById });
-              }
-            }
-          }}
-          className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md"
-        >
-          Contact Seller
-        </button>
-      )}
-
-      {product && product.category && (
-        <div className="md:col-span-2">
+      {product?.category && (
+        <div className="md:col-span-2 mt-12">
           <SimilarProducts category={product.category} productId={product.id} />
         </div>
       )}
