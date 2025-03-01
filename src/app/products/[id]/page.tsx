@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import SimilarProducts from "~/components/similar-products";
 import { api } from "~/trpc/react";
+import { useSession } from "next-auth/react";
 
 export default function ProductDetailsPage() {
   const { id } = useParams();
@@ -39,6 +40,7 @@ export default function ProductDetailsPage() {
 
   });
 
+  const { data: session } = useSession();
   const [mainImage, setMainImage] = useState<string | null>(null);
 
   if (!id || isLoading) return <div>Loading...</div>;
@@ -47,6 +49,8 @@ export default function ProductDetailsPage() {
   const existingConversation = conversations?.find(
     (conv) => conv.sellerId === product?.createdById
   );
+
+  const isSeller = session?.user.id === product?.createdById;
 
   return (
     <div className="container mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -95,20 +99,22 @@ export default function ProductDetailsPage() {
         </div>
       </div>
 
-      <button
-        onClick={() => {
-          if (product) {
-            if (existingConversation) {
-              router.push(`/chat?conversationId=${existingConversation.id}`);
-            } else {
-              createConversation({ sellerId: product.createdById });
+      {!isSeller && (
+        <button
+          onClick={() => {
+            if (product) {
+              if (existingConversation) {
+                router.push(`/chat?conversationId=${existingConversation.id}`);
+              } else {
+                createConversation({ sellerId: product.createdById });
+              }
             }
-          }
-        }}
-        className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md"
-      >
-        Contact Seller
-      </button>
+          }}
+          className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md"
+        >
+          Contact Seller
+        </button>
+      )}
 
       {product && product.category && (
         <div className="md:col-span-2">

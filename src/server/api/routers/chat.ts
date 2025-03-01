@@ -2,20 +2,50 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { db } from "~/server/db";
 import { z } from "zod";
 import { conversations, messages, users } from "~/server/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, or} from "drizzle-orm";
 
 export const chatRouter = createTRPCRouter({
   getConversations: protectedProcedure.query(async ({ ctx }) => {
-    return await db
+    const conversationsList = await db
       .select({
         id: conversations.id,
         sellerId: conversations.sellerId,
-        sellerName: users.name,
+        buyerId: conversations.buyerId,
       })
       .from(conversations)
-      .innerJoin(users, eq(conversations.sellerId, users.id))
-      .where(eq(conversations.buyerId, ctx.session.user.id));
+      .where(
+        or(
+          eq(conversations.sellerId, ctx.session.user.id),
+          eq(conversations.buyerId, ctx.session.user.id)
+        )
+      );
+  
+    const sellerIds = conversationsList.map((conv) => conv.sellerId);
+    const buyerIds = conversationsList.map((conv) => conv.buyerId);
+  
+    const sellers = await db
+      .select({
+        id: users.id,
+        name: users.name,
+      })
+      .from(users)
+      .where(or(...sellerIds.map((id) => eq(users.id, id))));
+  
+    const buyers = await db
+      .select({
+        id: users.id,
+        name: users.name,
+      })
+      .from(users)
+      .where(or(...buyerIds.map((id) => eq(users.id, id))));
+  
+    return conversationsList.map((conv) => ({
+      ...conv,
+      sellerName: sellers.find((s) => s.id === conv.sellerId)?.name || "Unknown",
+      buyerName: buyers.find((b) => b.id === conv.buyerId)?.name || "Unknown",
+    }));
   }),
+  
 
   createConversation: protectedProcedure
     .input(z.object({ sellerId: z.string() }))
