@@ -11,6 +11,7 @@ export const chatRouter = createTRPCRouter({
         id: conversations.id,
         sellerId: conversations.sellerId,
         buyerId: conversations.buyerId,
+        createdAt: conversations.createdAt,
       })
       .from(conversations)
       .where(
@@ -90,6 +91,7 @@ export const chatRouter = createTRPCRouter({
           content: messages.content,
           senderId: messages.senderId,
           senderName: users.name,
+          createdAt: messages.createdAt, 
         })
         .from(messages)
         .innerJoin(users, eq(messages.senderId, users.id))

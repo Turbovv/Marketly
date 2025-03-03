@@ -59,14 +59,15 @@ export default function ProductDetailsPage() {
         </div>
 
         <div className="flex gap-4 mt-6">
+
+          {!isSeller && (
+            <div>
           <button
             onClick={() => product && addToCartMutation.mutate({ productId: product.id, quantity: 1 })}
             className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition w-full md:w-auto"
           >
             Add to Cart
           </button>
-
-          {!isSeller && (
             <button
               onClick={() => {
                 if (product) {
@@ -81,6 +82,7 @@ export default function ProductDetailsPage() {
             >
               Contact Seller
             </button>
+            </div>
           )}
         </div>
       </div>

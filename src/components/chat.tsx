@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { api } from "~/trpc/react";
 import io from "socket.io-client";
 import { useSession } from "next-auth/react";
+import { formatDate } from "~/lib/format";
 
 export default function Chat({
   conversationId,
@@ -29,6 +30,7 @@ export default function Chat({
     content: string;
     senderId: string;
     senderName: string | null;
+    createdAt: string;
   }[]>(messages || []);
 
   const messageContainerRef = useRef<HTMLDivElement>(null);
@@ -72,6 +74,7 @@ export default function Chat({
         senderId: currentUserId,
         senderName: session?.user.name,
         content: message,
+        createdAt: new Date().toISOString(),
       };
 
       setAllMessages((prev: any) => [...prev, sentMessage]);
@@ -84,6 +87,7 @@ export default function Chat({
         senderId: currentUserId,
         senderName: session?.user.name,
         id: sentMessage.id,
+        createdAt: sentMessage.createdAt,
       });
 
       setMessage("");
@@ -111,6 +115,9 @@ export default function Chat({
               >
                 <p className="text-sm font-semibold">{msg.senderName}</p>
                 <p className="text-sm">{msg.content}</p>
+                <p className="text-xs ">
+                  {formatDate(new Date(msg.createdAt))}
+                </p>
               </div>
             </div>
           );

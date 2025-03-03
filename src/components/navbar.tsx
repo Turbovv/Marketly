@@ -13,12 +13,12 @@ export default async function Navbar() {
     return (
         <div>
             <SearchBar />
-            <Link href="/create" className="underline">
-            </Link>
             <div className="flex flex-col items-center gap-4">
                 {session && (
                     <div className="bg-gray-800 p-4 rounded-lg">
-                        <h1 className='text-white'>Add</h1>
+            <Link href="/create" className="underline">
+                <h1 className='text-white'>Add</h1>
+            </Link>
                         <Link href="/cart" className="text-white underline">
                             <p className="text-lg font-semibold">🛒 Cart Items: {cartCount}</p>
                         </Link>
