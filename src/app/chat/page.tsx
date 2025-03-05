@@ -43,8 +43,12 @@ export default function ChatPage() {
                 }}
               >
                 <div>
-                <p className="font-bold">{conversation.sellerId === session?.user.id ? conversation.buyerName : conversation.sellerName}</p>
-                <p className="text-gray-600 text-sm">Last message: Not available</p>
+                  <p className="font-bold">
+                    {conversation.sellerId === session?.user.id
+                      ? conversation.buyerName
+                      : conversation.sellerName}
+                  </p>
+                  <p className="text-gray-600 text-sm">Last message: Not available</p>
                 </div>
               </div>
             ))

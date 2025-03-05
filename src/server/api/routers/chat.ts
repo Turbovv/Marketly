@@ -97,4 +97,29 @@ export const chatRouter = createTRPCRouter({
         .innerJoin(users, eq(messages.senderId, users.id))
         .where(eq(messages.conversationId, input.conversationId));
     }),
+    deleteConversation: protectedProcedure
+  .input(z.object({ conversationId: z.number() }))
+  .mutation(async ({ ctx, input }) => {
+    const conversation = await db
+      .select()
+      .from(conversations)
+      .where(eq(conversations.id, input.conversationId))
+      .limit(1);
+
+    if (!conversation.length) {
+      throw new Error("Conversation not found.");
+    }
+
+    const conv = conversation[0];
+
+    if (conv && conv.sellerId !== ctx.session.user.id && conv.buyerId !== ctx.session.user.id) {
+      throw new Error("You are not authorized to delete this conversation.");
+    }
+
+    await db.delete(messages).where(eq(messages.conversationId, input.conversationId));
+
+    await db.delete(conversations).where(eq(conversations.id, input.conversationId));
+
+    return { success: true };
+  }),
 });

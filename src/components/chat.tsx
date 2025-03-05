@@ -5,6 +5,8 @@ import { api } from "~/trpc/react";
 import io from "socket.io-client";
 import { useSession } from "next-auth/react";
 import { formatDate } from "~/lib/format";
+import { useRouter } from "next/navigation";
+import DeleteConversationButton from "./delete-chat";
 
 export default function Chat({
   conversationId,
@@ -18,6 +20,7 @@ export default function Chat({
     { conversationId },
     { refetchOnWindowFocus: true }
   );
+  const router = useRouter();
 
   const sendMessageMutation = api.chat.sendMessage.useMutation({
     onSuccess: () => refetch(),
@@ -31,7 +34,7 @@ export default function Chat({
     senderId: string;
     senderName: string | null;
     createdAt: string;
-  }[]>(messages || []);
+  }[]>(messages ? messages.map(msg => ({ ...msg, createdAt: msg.createdAt.toString() })) : []);
 
   const messageContainerRef = useRef<HTMLDivElement>(null);
 
@@ -50,6 +53,13 @@ export default function Chat({
       });
     });
 
+    newSocket.on("conversationDeleted", (data) => {
+      if (data.conversationId === conversationId) {
+        alert("This conversation has been deleted.");
+        router.push("/chat");
+      }
+    });
+
     return () => {
       newSocket.disconnect();
     };
@@ -57,7 +67,7 @@ export default function Chat({
 
   useEffect(() => {
     if (messages && messages.length !== allMessages.length) {
-      setAllMessages(messages);
+      setAllMessages(messages.map(msg => ({ ...msg, createdAt: msg.createdAt.toString() })));
     }
   }, [messages]);
 
@@ -96,6 +106,7 @@ export default function Chat({
 
   return (
     <div className="p-4 border rounded-lg space-y-2 bg-gray-100">
+      <DeleteConversationButton conversationId={conversationId} />
       <div
         className="h-60 overflow-y-auto space-y-2 p-2"
         ref={messageContainerRef}

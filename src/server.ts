@@ -28,6 +28,11 @@ io.on("connection", (socket) => {
     console.log(`Message sent to conversation ${message.conversationId}: ${message.content}`);
   });
 
+  socket.on("deleteConversation", (conversationId: number) => {
+    io.to(`conversation-${conversationId}`).emit("conversationDeleted", { conversationId });
+    console.log(`Conversation ${conversationId} deleted`);
+  });
+
   socket.on("disconnect", () => {
     console.log("A user disconnected: " + socket.id);
   });
