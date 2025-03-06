@@ -1,6 +1,6 @@
 import { eq, ne } from "drizzle-orm";
 import { z } from "zod";
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "~/server/api/trpc";
 import { products } from "~/server/db/schema";
 import { ilike, and } from "drizzle-orm";
 import { db } from "~/server/db";
@@ -67,5 +67,22 @@ export const productsRouter = createTRPCRouter({
     return await ctx.db.query.products.findMany({
       where: ilike(products.name, `%${input.query}%`),
     });
+  }),
+
+  deleteProduct: protectedProcedure
+  .input(z.object({ id: z.number() }))
+  .mutation(async ({ input, ctx }) => {
+    const product = await ctx.db.query.products.findFirst({ where: eq(products.id, input.id) });
+
+    if (!product) {
+      throw new Error("Product not found");
+    }
+
+    if (product.createdById !== ctx.session.user.id) {
+      throw new Error("Unauthorized");
+    }
+
+    await ctx.db.delete(products).where(eq(products.id, input.id));
+    return { success: true };
   }),
 });
