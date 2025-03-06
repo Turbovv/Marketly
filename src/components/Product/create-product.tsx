@@ -3,7 +3,7 @@ import { useSession } from "next-auth/react";
 import { useState } from "react";
 import { api } from "~/trpc/react";
 import { useRouter } from "next/navigation";
-import UploadThing from "./upload-thing";
+import UploadThing from "../upload-thing";
 
 export default function CreateProductPage() {
   const [name, setName] = useState("");
