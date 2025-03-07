@@ -1,50 +1,38 @@
 import { createServer } from "http";
 import express from "express";
 import { Server } from "socket.io";
-import path from "path";
+import cors from "cors";
 
 const app = express();
 const server = createServer(app);
 
+app.use(cors({ origin: "http://localhost:3000", methods: ["GET", "POST"] }));
+
 const io = new Server(server, {
-  cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
-  },
+  cors: { origin: "http://localhost:3000", methods: ["GET", "POST"] },
 });
 
-let activeConversations: Record<number, string[]> = {};  
-
 io.on("connection", (socket) => {
-  console.log("A user connected: " + socket.id);
+  console.log(`User connected: ${socket.id}`);
 
-  socket.on("joinRoom", (conversationId: number) => {
+  socket.on("joinRoom", (conversationId) => {
     socket.join(`conversation-${conversationId}`);
     console.log(`User ${socket.id} joined conversation ${conversationId}`);
   });
 
-  socket.on("sendMessage", (message: { conversationId: number, content: string, senderId: string, senderName: string }) => {
+  socket.on("sendMessage", (message) => {
     io.to(`conversation-${message.conversationId}`).emit("newMessage", message);
-    console.log(`Message sent to conversation ${message.conversationId}: ${message.content}`);
+    console.log(`Message sent in conversation ${message.conversationId}: ${message.content}`);
   });
 
-  socket.on("deleteConversation", (conversationId: number) => {
+  socket.on("deleteConversation", (conversationId) => {
     io.to(`conversation-${conversationId}`).emit("conversationDeleted", { conversationId });
     console.log(`Conversation ${conversationId} deleted`);
   });
 
   socket.on("disconnect", () => {
-    console.log("A user disconnected: " + socket.id);
+    console.log(`User disconnected: ${socket.id}`);
   });
 });
 
-const __dirname = path.dirname(new URL(import.meta.url).pathname);
-app.use(express.static(path.join(__dirname, "public")));
-
-app.get("/", (req, res) => {
-  res.send("Hello World! Express server is running.");
-});
-
-server.listen(3001, () => {
-  console.log("Server is running on http://localhost:3001");
-});
+server.listen(3001, () => console.log("Server running on http://localhost:3001"));

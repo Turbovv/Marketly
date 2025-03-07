@@ -29,9 +29,9 @@ export default function ProductDetailsPage() {
   });
 
   const { mutate: createConversation } = api.chat.createConversation.useMutation({
-    onSuccess: (conversation: { id: number }[]) => {
-      if (conversation && conversation[0]) {
-        router.push(`/chat?conversationId=${conversation[0].id}`);
+    onSuccess: (conversation) => {
+      if (conversation) {
+        router.push(`/chat?conversationId=${conversation.id}`);
       }
     },
   });

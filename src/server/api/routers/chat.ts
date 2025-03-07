@@ -2,7 +2,7 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { db } from "~/server/db";
 import { z } from "zod";
 import { conversations, messages, users } from "~/server/db/schema";
-import { eq, and, or} from "drizzle-orm";
+import { eq, and, or } from "drizzle-orm";
 
 export const chatRouter = createTRPCRouter({
   getConversations: protectedProcedure.query(async ({ ctx }) => {
@@ -25,28 +25,21 @@ export const chatRouter = createTRPCRouter({
     const buyerIds = conversationsList.map((conv) => conv.buyerId);
   
     const sellers = await db
-      .select({
-        id: users.id,
-        name: users.name,
-      })
+      .select({ id: users.id, name: users.name })
       .from(users)
       .where(or(...sellerIds.map((id) => eq(users.id, id))));
-  
+
     const buyers = await db
-      .select({
-        id: users.id,
-        name: users.name,
-      })
+      .select({ id: users.id, name: users.name })
       .from(users)
       .where(or(...buyerIds.map((id) => eq(users.id, id))));
-  
+
     return conversationsList.map((conv) => ({
       ...conv,
       sellerName: sellers.find((s) => s.id === conv.sellerId)?.name || "Unknown",
       buyerName: buyers.find((b) => b.id === conv.buyerId)?.name || "Unknown",
     }));
   }),
-  
 
   createConversation: protectedProcedure
     .input(z.object({ sellerId: z.string() }))
@@ -57,29 +50,39 @@ export const chatRouter = createTRPCRouter({
         .where(
           and(
             eq(conversations.sellerId, input.sellerId),
-            eq(conversations.buyerId, ctx.session.user.id),
-          ),
+            eq(conversations.buyerId, ctx.session.user.id)
+          )
         )
         .limit(1);
 
       if (existingConversation.length > 0) {
-        return existingConversation;
+        return existingConversation[0]; // Return the existing conversation
       }
 
-      return await db.insert(conversations).values({
-        buyerId: ctx.session.user.id,
-        sellerId: input.sellerId,
-      });
+      const newConversation = await db
+        .insert(conversations)
+        .values({
+          buyerId: ctx.session.user.id,
+          sellerId: input.sellerId,
+        })
+        .returning();
+
+      return newConversation[0];
     }),
 
   sendMessage: protectedProcedure
     .input(z.object({ conversationId: z.number(), content: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      return await db.insert(messages).values({
-        conversationId: input.conversationId,
-        senderId: ctx.session.user.id,
-        content: input.content,
-      });
+      const newMessage = await db
+        .insert(messages)
+        .values({
+          conversationId: input.conversationId,
+          senderId: ctx.session.user.id,
+          content: input.content,
+        })
+        .returning();
+
+      return newMessage[0];
     }),
 
   getMessages: protectedProcedure
@@ -117,7 +120,6 @@ export const chatRouter = createTRPCRouter({
     }
 
     await db.delete(messages).where(eq(messages.conversationId, input.conversationId));
-
     await db.delete(conversations).where(eq(conversations.id, input.conversationId));
 
     return { success: true };
