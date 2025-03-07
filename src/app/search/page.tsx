@@ -18,7 +18,9 @@ export default function SearchResults() {
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
 
   useEffect(() => {
-    setFilteredProducts(sortProducts(products || [], sortOption));
+    if (products) {
+      setFilteredProducts(sortProducts(products, sortOption));
+    }
   }, [products, sortOption]);
 
   return (

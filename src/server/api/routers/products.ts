@@ -102,6 +102,7 @@ export const productsRouter = createTRPCRouter({
         where: or(
           ilike(products.name, `%${input.query}%`),
           ilike(products.category, `%${input.query}%`),
+          ilike(products.subcategory, `%${input.query}%`)
         ),
       });
     }),
