@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
-export default function page() {
+export default function Dashboard() {
   const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,7 +50,6 @@ export default function page() {
         <h3 className="font-semibold">User Information</h3>
         <p><strong>Name:</strong> {userData?.name}</p>
         <p><strong>Email:</strong> {userData?.email}</p>
-        {/* Add more fields depending on the response */}
       </div>
     </div>
   );

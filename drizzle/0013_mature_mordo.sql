@@ -1,0 +1,1 @@
+ALTER TABLE "mymarket_user" ADD COLUMN "confirmation_code" varchar(6) NOT NULL;

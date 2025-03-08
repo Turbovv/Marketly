@@ -15,7 +15,7 @@ export default function RegisterPage() {
 
     try {
       await axios.post("http://localhost:3001/api/register", { name, email, password });
-      router.push("/login");
+      router.push("/confirm");
     } catch (err) {
       setError("Failed to register. Please try again.");
     }

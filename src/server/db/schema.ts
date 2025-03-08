@@ -53,6 +53,8 @@ export const users = createTable("user", {
   }).default(sql`CURRENT_TIMESTAMP`),
   image: varchar("image", { length: 255 }),
   password: varchar("password", { length: 255 }).notNull(),
+  confirmed: integer("confirmed").default(0).notNull(),
+  confirmationCode: varchar("confirmation_code", { length: 6 }).notNull(),
 });
 
 export const products = createTable("products", {
