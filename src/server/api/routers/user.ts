@@ -67,7 +67,6 @@ export const authRouter = createTRPCRouter({
         userType: 'jwt'
       }, 
       JWT_SECRET, 
-      { expiresIn: "1h" }
     );
 
     return { 
@@ -117,7 +116,10 @@ export const authRouter = createTRPCRouter({
         .set({ confirmed: 1 })
         .where(eq(users.email, input.email));
 
-      const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "1h" });
+      const token = jwt.sign(
+        { userId: user.id }, 
+        JWT_SECRET
+      );
       return { token };
     }),
 
@@ -161,7 +163,6 @@ export const authRouter = createTRPCRouter({
           userType: 'jwt'
         }, 
         JWT_SECRET, 
-        { expiresIn: "1h" }
       );
 
       return { 
@@ -186,6 +187,7 @@ export const authRouter = createTRPCRouter({
           email: string;
           name: string;
           userType: string;
+          exp?: number;
         };
         
         const user = await ctx.db.query.users.findFirst({
@@ -197,6 +199,30 @@ export const authRouter = createTRPCRouter({
             code: "NOT_FOUND",
             message: "User not found",
           });
+        }
+  
+        const tokenExp = decoded.exp ? decoded.exp * 1000 : 0;
+        const fiveMinutes = 5 * 60 * 1000;
+        
+        if (tokenExp - Date.now() < fiveMinutes) {
+          const newToken = jwt.sign(
+            { 
+              userId: user.id,
+              email: user.email,
+              name: user.name,
+              userType: 'jwt'
+            }, 
+            JWT_SECRET, 
+            { expiresIn: "1h" }
+          );
+  
+          return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            userType: user.userType,
+            newToken
+          };
         }
   
         return {

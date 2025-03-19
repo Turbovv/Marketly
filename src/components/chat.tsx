@@ -3,10 +3,10 @@
 import { useEffect, useState, useRef } from "react";
 import { api } from "~/trpc/react";
 import io from "socket.io-client";
-import { useSession } from "next-auth/react";
 import { formatDate } from "~/lib/format";
 import { useRouter } from "next/navigation";
 import DeleteConversationButton from "./delete-chat";
+import { useAuth } from "~/hooks/useAuth";
 
 export default function Chat({
   conversationId,
@@ -15,19 +15,24 @@ export default function Chat({
   conversationId: number;
   currentUserId: string;
 }) {
-  const { data: session} = useSession();
-  const { data: messages, refetch } = api.chat.getMessages.useQuery(
-    { conversationId },
-    { refetchOnWindowFocus: true }
-  );
+  const { jwtUser, nextAuthSession, isAuthenticated } = useAuth();
+  const userName = jwtUser?.name || nextAuthSession?.user?.name;
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState<any[]>([]);
+  const [socket, setSocket] = useState<any>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const { data: chatMessages, refetch } = api.chat.getMessages.useQuery(
+    { conversationId },
+    { enabled: isAuthenticated }
+  );
 
   const sendMessageMutation = api.chat.sendMessage.useMutation({
-    onSuccess: () => refetch(),
+    onSuccess: () => {
+      refetch();
+    },
   });
 
-  const [message, setMessage] = useState("");
-  const [socket, setSocket] = useState<any>(null);
   const [allMessages, setAllMessages] = useState<
     { id: number | string; content: string; senderId: string; senderName: string | null; createdAt: string }[]
   >([]);
@@ -57,10 +62,10 @@ export default function Chat({
   }, [conversationId]);
 
   useEffect(() => {
-    if (messages) {
-      setAllMessages(messages.map(msg => ({ ...msg, createdAt: msg.createdAt.toString() })));
+    if (chatMessages) {
+      setAllMessages(chatMessages.map(msg => ({ ...msg, createdAt: msg.createdAt.toString() })));
     }
-  }, [messages]);
+  }, [chatMessages]);
 
   useEffect(() => {
     if (messageContainerRef.current) {
@@ -74,7 +79,7 @@ export default function Chat({
   const sentMessage = {
     id: `temp-${Date.now()}`,
     senderId: currentUserId,
-    senderName: session?.user.name,
+    senderName: userName,
     content: message,
     createdAt: new Date().toISOString(),
   };
@@ -86,7 +91,7 @@ export default function Chat({
       conversationId,
       content: message,
       senderId: currentUserId,
-      senderName: session?.user.name,
+      senderName: userName,
       createdAt: sentMessage.createdAt,
     });
   }

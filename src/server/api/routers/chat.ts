@@ -3,9 +3,17 @@ import { db } from "~/server/db";
 import { z } from "zod";
 import { conversations, messages, users } from "~/server/db/schema";
 import { eq, and, or } from "drizzle-orm";
+import jwt from "jsonwebtoken";
+import { TRPCError } from "@trpc/server";
 
 export const chatRouter = createTRPCRouter({
   getConversations: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session?.user?.id || ctx.jwtUser?.userId;
+
+    if (!userId) {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
+
     const conversationsList = await db
       .select({
         id: conversations.id,
@@ -16,8 +24,8 @@ export const chatRouter = createTRPCRouter({
       .from(conversations)
       .where(
         or(
-          eq(conversations.sellerId, ctx.session.user.id),
-          eq(conversations.buyerId, ctx.session.user.id)
+          eq(conversations.sellerId, userId),
+          eq(conversations.buyerId, userId)
         )
       );
   
@@ -44,25 +52,31 @@ export const chatRouter = createTRPCRouter({
   createConversation: protectedProcedure
     .input(z.object({ sellerId: z.string() }))
     .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session?.user?.id || ctx.jwtUser?.userId;
+
+      if (!userId) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
       const existingConversation = await db
         .select()
         .from(conversations)
         .where(
           and(
             eq(conversations.sellerId, input.sellerId),
-            eq(conversations.buyerId, ctx.session.user.id)
+            eq(conversations.buyerId, userId)
           )
         )
         .limit(1);
 
       if (existingConversation.length > 0) {
-        return existingConversation[0]; // Return the existing conversation
+        return existingConversation[0];
       }
 
       const newConversation = await db
         .insert(conversations)
         .values({
-          buyerId: ctx.session.user.id,
+          buyerId: userId,
           sellerId: input.sellerId,
         })
         .returning();
@@ -73,11 +87,17 @@ export const chatRouter = createTRPCRouter({
   sendMessage: protectedProcedure
     .input(z.object({ conversationId: z.number(), content: z.string() }))
     .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session?.user?.id || ctx.jwtUser?.userId;
+
+      if (!userId) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
       const newMessage = await db
         .insert(messages)
         .values({
           conversationId: input.conversationId,
-          senderId: ctx.session.user.id,
+          senderId: userId,
           content: input.content,
         })
         .returning();
@@ -87,7 +107,13 @@ export const chatRouter = createTRPCRouter({
 
   getMessages: protectedProcedure
     .input(z.object({ conversationId: z.number() }))
-    .query(async ({ input }) => {
+    .query(async ({ ctx, input }) => {
+      const userId = ctx.session?.user?.id || ctx.jwtUser?.userId;
+
+      if (!userId) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
       return await db
         .select({
           id: messages.id,
@@ -100,9 +126,16 @@ export const chatRouter = createTRPCRouter({
         .innerJoin(users, eq(messages.senderId, users.id))
         .where(eq(messages.conversationId, input.conversationId));
     }),
+
     deleteConversation: protectedProcedure
-  .input(z.object({ conversationId: z.number() }))
-  .mutation(async ({ ctx, input }) => {
+    .input(z.object({ conversationId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session?.user?.id || ctx.jwtUser?.userId;
+
+      if (!userId) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
     const conversation = await db
       .select()
       .from(conversations)
@@ -110,13 +143,19 @@ export const chatRouter = createTRPCRouter({
       .limit(1);
 
     if (!conversation.length) {
-      throw new Error("Conversation not found.");
+      throw new TRPCError({ 
+          code: "NOT_FOUND",
+          message: "Conversation not found."
+        });
     }
 
     const conv = conversation[0];
 
-    if (conv && conv.sellerId !== ctx.session.user.id && conv.buyerId !== ctx.session.user.id) {
-      throw new Error("You are not authorized to delete this conversation.");
+    if (conv && conv.sellerId !== userId && conv.buyerId !== userId) {
+      throw new TRPCError({ 
+          code: "FORBIDDEN",
+          message: "You are not authorized to delete this conversation."
+        });
     }
 
     await db.delete(messages).where(eq(messages.conversationId, input.conversationId));

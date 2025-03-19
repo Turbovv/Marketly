@@ -14,38 +14,47 @@ export interface JWTUser {
     name: string | null;
     email: string;
   }
+  
   export const useAuth = () => {
     const { data: nextAuthSession } = useSession();
     const [jwtUser, setJwtUser] = useState<JWTUser | null>(null);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [token, setToken] = useState<string | null>(null);
   
     useEffect(() => {
-      if (typeof window !== 'undefined') {
-        const storedToken = localStorage.getItem('token');
-        setToken(storedToken);
-      }
+      const storedToken = localStorage.getItem('token');
+      setToken(storedToken);
     }, []);
   
-    const { data: userData } = api.user.getUser.useQuery(
+    const { data: userData, error }: any = api.user.getUser.useQuery(
       { token: token || '' },
       { 
         enabled: !!token,
-        retry: false
+        retry: false,
+        onError: (error: any) => {
+          if (error?.message === 'Invalid token' || error?.message?.includes('expired')) {
+            localStorage.removeItem('token');
+            setJwtUser(null);
+            setIsAuthenticated(false);
+            window.location.href = '/login';
+          }
+        }
       }
     );
   
     useEffect(() => {
       if (userData) {
-        setJwtUser({
-          id: userData.id,
-          name: userData.name ?? '',
-          email: userData.email,
-          userType: userData.userType
-        });
+        setJwtUser(userData);
+        setIsAuthenticated(true);
+        
+        if (userData.newToken) {
+          localStorage.setItem('token', userData.newToken);
+          setToken(userData.newToken);
+        }
+      } else if (nextAuthSession?.user) {
+        setIsAuthenticated(true);
       }
-    }, [userData]);
-  
-    const isAuthenticated = Boolean(nextAuthSession?.user || jwtUser);
+    }, [userData, nextAuthSession]);
   
     return {
       isAuthenticated,

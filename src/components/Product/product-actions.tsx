@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import DeleteProductButton from "./delete-product";
 import { api } from "~/trpc/react";
+import { useAuth } from "~/hooks/useAuth";
 
 export default function ProductActions({
   isSeller,
@@ -12,6 +13,9 @@ export default function ProductActions({
 }: any) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [message, setMessage] = useState("");
+  const { userId } = useAuth();
+
+  const isProductOwner = userId === product?.createdById;
 
   const sendMessage = api.chat.sendMessage.useMutation();
   const createConversationMutation = api.chat.createConversation.useMutation();
@@ -50,7 +54,7 @@ export default function ProductActions({
     <div className="flex gap-6 mt-6">
       <div className="w-full flex flex-col gap-4">
         {isSeller && product && <DeleteProductButton productId={product.id} />}
-        {!isSeller && (
+        {!isSeller && !isProductOwner && (
           <>
             <button
               onClick={() => product && addToCartMutation.mutate({ productId: product.id, quantity: 1 })}

@@ -14,6 +14,8 @@ import { ZodError } from "zod";
 import { auth } from "~/server/auth";
 import { db } from "../db";
 import jwt from "jsonwebtoken";
+import { eq } from "drizzle-orm";
+import { users } from "../db/schema";
 
 const JWT_SECRET = process.env.JWT_SECRET || "+8APs0PI/xDA6v42wSxTcS++8hdIC6/5r1taMlGaq/I=";
 
@@ -36,14 +38,19 @@ interface CreateContextOptions {
 export const createTRPCContext = async (opts: CreateContextOptions) => {
   const session = await auth();
   
-  // Get JWT token from headers
   const authHeader = opts.headers.get("authorization");
   let jwtUser = null;
 
   if (authHeader?.startsWith("Bearer ")) {
     const token = authHeader.substring(7);
     try {
-      const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+      const decoded = jwt.verify(token, JWT_SECRET) as { 
+        userId: string;
+        email: string;
+        name: string;
+        userType: string;
+      };
+
       jwtUser = decoded;
     } catch (error) {
       console.error("JWT verification failed:", error);

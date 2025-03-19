@@ -3,20 +3,20 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { api } from "~/trpc/react";
-import { useSession } from "next-auth/react";
 import Chat from "~/components/chat";
+import { useAuth } from "~/hooks/useAuth";
 
 export default function ChatPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { data: session } = useSession();
+  const { jwtUser, nextAuthSession, isAuthenticated, userId } = useAuth();
 
   const conversationId = searchParams.get("conversationId");
   const [selectedConversation, setSelectedConversation] = useState<number | null>(null);
 
   const { data: conversations, isLoading, error } = api.chat.getConversations.useQuery(
     undefined,
-    { enabled: !!session?.user.id }
+    { enabled: isAuthenticated }
   );
 
   useEffect(() => {
@@ -44,7 +44,7 @@ export default function ChatPage() {
               >
                 <div>
                   <p className="font-bold">
-                    {conversation.sellerId === session?.user.id
+                    {conversation.sellerId === userId
                       ? conversation.buyerName
                       : conversation.sellerName}
                   </p>
@@ -61,7 +61,7 @@ export default function ChatPage() {
           <h2>Conversation {selectedConversation}</h2>
           <Chat
             conversationId={selectedConversation}
-            currentUserId={session?.user.id ?? ''}
+            currentUserId={userId ?? ''}
           />
         </div>
       )}
