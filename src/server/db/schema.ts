@@ -47,14 +47,13 @@ export const users = createTable("user", {
     .$defaultFn(() => crypto.randomUUID()),
   name: varchar("name", { length: 255 }),
   email: varchar("email", { length: 255 }).notNull(),
-  emailVerified: timestamp("email_verified", {
-    mode: "date",
-    withTimezone: true,
-  }).default(sql`CURRENT_TIMESTAMP`),
+  emailVerified: timestamp("email_verified", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`),
   image: varchar("image", { length: 255 }),
-  password: varchar("password", { length: 255 }).notNull(),
-  confirmed: integer("confirmed").default(0).notNull(),
-  confirmationCode: varchar("confirmation_code", { length: 6 }).notNull(),
+  password: varchar("password", { length: 255 }),
+  confirmed: integer("confirmed").default(0),
+  confirmationCode: varchar("confirmation_code", { length: 6 }),
+  userType: varchar("user_type", { length: 10 }).notNull().default('oauth'),
 });
 
 export const products = createTable("products", {

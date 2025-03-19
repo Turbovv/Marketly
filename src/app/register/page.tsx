@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react";
-import axios from "axios";
 import { useRouter } from "next/navigation";
+import { api } from "~/trpc/react";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -10,15 +10,18 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
+  const { mutate: register } = api.user.register.useMutation({
+    onSuccess: () => {
+      router.push("/confirm");
+    },
+    onError: (error) => {
+      setError(error.message);
+    },
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    try {
-      await axios.post("http://localhost:3001/api/register", { name, email, password });
-      router.push("/confirm");
-    } catch (err) {
-      setError("Failed to register. Please try again.");
-    }
+    register({ name, email, password });
   };
 
   return (

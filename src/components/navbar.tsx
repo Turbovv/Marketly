@@ -3,6 +3,8 @@ import Link from "next/link";
 import SearchBar from "~/components/search-bar";
 import { auth } from "~/server/auth";
 import { api } from "~/trpc/server";
+import AuthStatus from './auth-content';
+
 export default async function Navbar() {
     const session = await auth();
     let cartCount = 0;
@@ -24,9 +26,7 @@ export default async function Navbar() {
                         </Link>
                     </div>
                 )}
-                <p className="text-center text-2xl text-black">
-                    {session && <span>Logged in as {session.user?.name}</span>}
-                </p>
+                <AuthStatus />
                 <Link
                     href={session ? "/api/auth/signout" : "/api/auth/signin"}
                     className="rounded-full bg-white/10 px-10 py-3 font-semibold no-underline transition hover:bg-white/20"

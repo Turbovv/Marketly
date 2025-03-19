@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
-import axios from "axios";
 import { useRouter } from "next/navigation";
+import { api } from "~/trpc/react";
 
 export default function ConfirmPage() {
   const [email, setEmail] = useState("");
@@ -9,29 +9,21 @@ export default function ConfirmPage() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const handleConfirmEmail = async (e: React.FormEvent) => {
+  const { mutate: confirmEmail } = api.user.confirmEmail.useMutation({
+    onSuccess: (data) => {
+      localStorage.setItem("token", data.token);
+      router.push("/dashboard");
+    },
+    onError: (error) => {
+      setError(error.message);
+    },
+  });
+
+  const handleConfirmEmail = (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!code) {
-      return alert("Please enter the confirmation code.");
-    }
-
-    try {
-      const response = await axios.post("http://localhost:3001/api/confirm-email", {
-        email,
-        confirmationCode: code,
-      });
-
-      if (response.data.token) {
-        localStorage.setItem("token", response.data.token);
-
-        router.push("/dashboard");
-      }
-    } catch (error) {
-      console.error("Error confirming email:", error);
-      alert("Failed to confirm email. Please try again.");
-    }
+    confirmEmail({ email, confirmationCode: code });
   };
+
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white shadow-lg rounded-lg">

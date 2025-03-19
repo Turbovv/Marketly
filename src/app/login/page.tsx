@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react";
-import axios from "axios";
 import { useRouter } from "next/navigation";
+import { api } from "~/trpc/react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -9,16 +9,19 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
+  const { mutate: login } = api.user.login.useMutation({
+    onSuccess: (data) => {
+      localStorage.setItem("token", data.token);
+      router.push("/dashboard");
+    },
+    onError: (error) => {
+      setError(error.message);
+    },
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    try {
-      const response = await axios.post("http://localhost:3001/api/login", { email, password });
-      localStorage.setItem("token", response.data.token);
-      router.push("/dashboard");
-    } catch (err) {
-      setError("Invalid credentials. Please try again.");
-    }
+    login({ email, password });
   };
 
   return (

@@ -5,27 +5,62 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import { products } from "~/server/db/schema";
+import { products, users } from "~/server/db/schema";
 import { db } from "~/server/db";
+import jwt from "jsonwebtoken";
+import { TRPCError } from "@trpc/server";
+
+const JWT_SECRET = process.env.JWT_SECRET || "+8APs0PI/xDA6v42wSxTcS++8hdIC6/5r1taMlGaq/I=";
 
 export const productsRouter = createTRPCRouter({
   getProducts: publicProcedure.query(async ({ ctx }) => {
     return await ctx.db.query.products.findMany();
   }),
   createProduct: publicProcedure
-    .input(
-      z.object({
-        name: z.string(),
-        url: z.string(),
-        desc: z.string(),
-        price: z.number(),
-        imageUrls: z.array(z.string()),
-        category: z.string(),
-        subcategory: z.string().optional(),
-        createdById: z.string(),
-      }),
-    )
-    .mutation(async ({ input, ctx }) => {
+  .input(
+    z.object({
+      name: z.string(),
+      url: z.string(),
+      desc: z.string(),
+      price: z.number(),
+      imageUrls: z.array(z.string()),
+      category: z.string(),
+      subcategory: z.string().optional(),
+      createdById: z.string(),
+    }),
+  )
+  .mutation(async ({ input, ctx }) => {
+    const authHeader = ctx.headers?.get("authorization");
+    const jwtToken = authHeader?.replace("Bearer ", "");
+
+    if (jwtToken) {
+      try {
+        const decoded = jwt.verify(jwtToken, JWT_SECRET) as { userId: string };
+        const user = await ctx.db.query.users.findFirst({
+          where: and(
+            eq(users.id, decoded.userId),
+            eq(users.userType, 'jwt')
+          ),
+        });
+
+        if (user && user.id === input.createdById) {
+          return await ctx.db.insert(products).values({
+            name: input.name,
+            url: input.url,
+            desc: input.desc,
+            price: input.price.toString(),
+            imageUrls: input.imageUrls.join(","),
+            category: input.category,
+            subcategory: input.subcategory || null,
+            createdById: user.id,
+          });
+        }
+      } catch (error) {
+        console.error("JWT verification failed:", error);
+      }
+    }
+
+    if (ctx.session?.user?.id === input.createdById) {
       return await ctx.db.insert(products).values({
         name: input.name,
         url: input.url,
@@ -34,9 +69,15 @@ export const productsRouter = createTRPCRouter({
         imageUrls: input.imageUrls.join(","),
         category: input.category,
         subcategory: input.subcategory || null,
-        createdById: input.createdById,
+        createdById: ctx.session.user.id,
       });
-    }),
+    }
+
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: "You must be logged in to create a product",
+    });
+  }),
   getProductsByCategory: publicProcedure
     .input(
       z.object({
@@ -118,11 +159,25 @@ export const productsRouter = createTRPCRouter({
         throw new Error("Product not found");
       }
 
-      if (product.createdById !== ctx.session.user.id) {
+      if (product.createdById !== ctx?.session?.user.id) {
         throw new Error("Unauthorized");
       }
 
       await ctx.db.delete(products).where(eq(products.id, input.id));
       return { success: true };
     }),
+    verifyToken: publicProcedure
+      .input(z.object({ token: z.string() }))
+      .query(async ({ input }) => {
+        try {
+          const decoded = jwt.verify(input.token, JWT_SECRET);
+          return { success: true, user: decoded };
+        } catch (error) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "Invalid token",
+          });
+        }
+      }),
 });
+

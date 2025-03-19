@@ -1,47 +1,30 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import { api } from "~/trpc/react";
 
 export default function Dashboard() {
-  const [userData, setUserData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const { data: userData, error } = api.user.getUser.useQuery(
+    { token: typeof window !== 'undefined' ? localStorage.getItem("token") || "" : "" },
+    { enabled: typeof window !== 'undefined' && !!localStorage.getItem("token") }
+  );
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        router.push("/login");
-        return;
-      }
-
-      try {
-        const response = await axios.get("http://localhost:3001/api/dashboard", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setUserData(response.data);
-      } catch (err) {
-        setError("Failed to fetch user data.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserData();
+    if (!localStorage.getItem("token")) {
+      router.push("/login");
+    }
   }, [router]);
 
-  if (loading) {
+  if (error) {
+    return <div className="text-red-500">Failed to fetch user data</div>;
+  }
+
+  if (!userData) {
     return <div>Loading...</div>;
   }
 
-  if (error) {
-    return <div className="text-red-500">{error}</div>;
-  }
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white shadow-lg rounded-lg">

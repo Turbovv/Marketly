@@ -1,9 +1,9 @@
 "use client";
-import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { api } from "~/trpc/react";
 import { useRouter } from "next/navigation";
 import UploadThing from "../upload-thing";
+import { useAuth } from "~/hooks/useAuth";
 
 export default function CreateProductPage() {
   const [name, setName] = useState("");
@@ -12,9 +12,17 @@ export default function CreateProductPage() {
   const [category, setCategory] = useState("");
   const [subcategory, setSubCategory] = useState("");
   const [imageUrls, setImageUrls] = useState<string[]>([]);
-  const { data: session } = useSession();
-
+  
+  const { isAuthenticated, userId, jwtUser, nextAuthSession } = useAuth();
   const { mutateAsync } = api.products.createProduct.useMutation();
+  const [authChecked, setAuthChecked] = useState(false);
+
+  useEffect(() => {
+    if (jwtUser || nextAuthSession?.user) {
+      setAuthChecked(true);
+    }
+  }, [jwtUser, nextAuthSession]);
+
   const router = useRouter();
 
   const categoryOptions: Record<string, string[]> = {
@@ -26,12 +34,22 @@ export default function CreateProductPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!session) {
-      console.error("User session is not available.");
+  
+    if (!isAuthenticated) {
+      console.error("User is not authenticated.");
       return;
     }
+  
     try {
+      const createdById = jwtUser?.id || nextAuthSession?.user?.id;
+  
+      if (!createdById) {
+        console.error("User ID not found");
+        return;
+      }
+  
+      console.log("Creating product with user:", { jwtUser, nextAuthSession });
+  
       await mutateAsync({
         name,
         imageUrls,
@@ -40,11 +58,15 @@ export default function CreateProductPage() {
         category,
         subcategory,
         url: imageUrls[0] || "",
-        createdById: session.user.id,
+        createdById,
       });
+      
       router.push("/");
     } catch (error) {
       console.error("Error creating product:", error);
+      if (error instanceof Error) {
+        console.error("Error details:", error.message);
+      }
     }
   };
 
