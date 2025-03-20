@@ -3,7 +3,6 @@
 import { useParams, useRouter } from "next/navigation";
 import SimilarProducts from "~/components/similar-products";
 import { api } from "~/trpc/react";
-import { useSession } from "next-auth/react";
 import ProductImageCarousel from "~/components/image-carousel";
 import ProductActions from "~/components/Product/product-actions";
 import ProductInfo from "~/components/Product/product-info";
@@ -40,14 +39,12 @@ export default function ProductDetailsPage() {
     userId: product?.createdById as string,
   });
 
-  const { data: session } = useSession();
 
   if (!id || isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading product: {error.message}</div>;
 
   const images = product ? [product.url, ...product.imageUrls] : [];
   const existingConversation = conversations?.find((conv) => conv.sellerId === product?.createdById);
-  const isSeller = session?.user.id === product?.createdById;
 
   return (
     <div className="container mx-auto p-8 md:p-12 grid grid-cols-1 md:grid-cols-2 gap-10">
@@ -56,7 +53,6 @@ export default function ProductDetailsPage() {
       </div>
       <ProductInfo product={product} userProducts={userProducts} />
       <ProductActions
-        isSeller={isSeller}
         product={product}
         addToCartMutation={addToCartMutation}
         existingConversation={existingConversation}

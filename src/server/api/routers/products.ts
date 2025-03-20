@@ -150,17 +150,25 @@ export const productsRouter = createTRPCRouter({
 
   deleteProduct: protectedProcedure
     .input(z.object({ id: z.number() }))
-    .mutation(async ({ input, ctx }) => {
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session?.user?.id || ctx.jwtUser?.userId;
+
       const product = await ctx.db.query.products.findFirst({
         where: eq(products.id, input.id),
       });
 
       if (!product) {
-        throw new Error("Product not found");
+        throw new TRPCError({ 
+          code: "NOT_FOUND",
+          message: "Product not found" 
+        });
       }
 
-      if (product.createdById !== ctx?.session?.user.id) {
-        throw new Error("Unauthorized");
+      if (product.createdById !== userId) {
+        throw new TRPCError({ 
+          code: "FORBIDDEN",
+          message: "Not authorized to delete this product" 
+        });
       }
 
       await ctx.db.delete(products).where(eq(products.id, input.id));

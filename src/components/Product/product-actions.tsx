@@ -5,7 +5,6 @@ import { api } from "~/trpc/react";
 import { useAuth } from "~/hooks/useAuth";
 
 export default function ProductActions({
-  isSeller,
   product,
   addToCartMutation,
   existingConversation,
@@ -13,12 +12,18 @@ export default function ProductActions({
 }: any) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [message, setMessage] = useState("");
-  const { userId } = useAuth();
+  const { userId, jwtUser, nextAuthSession, isAuthenticated } = useAuth();
 
-  const isProductOwner = userId === product?.createdById;
+  const isOwner = userId === product?.createdById ||
+    nextAuthSession?.user?.id === product?.createdById ||
+    jwtUser?.id === product?.createdById;
 
   const sendMessage = api.chat.sendMessage.useMutation();
   const createConversationMutation = api.chat.createConversation.useMutation();
+
+  if (!isAuthenticated || !userId) {
+    return null;
+  }
 
   const handleSendMessage = async () => {
     if (!message.trim()) return;
@@ -53,8 +58,8 @@ export default function ProductActions({
   return (
     <div className="flex gap-6 mt-6">
       <div className="w-full flex flex-col gap-4">
-        {isSeller && product && <DeleteProductButton productId={product.id} />}
-        {!isSeller && !isProductOwner && (
+        {isOwner && product && <DeleteProductButton productId={product.id} />}
+        {!isOwner && (
           <>
             <button
               onClick={() => product && addToCartMutation.mutate({ productId: product.id, quantity: 1 })}

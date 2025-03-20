@@ -46,12 +46,29 @@ export default function Navbar() {
                     {nextAuthSession?.user && <span>Welcome, {nextAuthSession.user.name}!</span>}
                 </div>
 
+                {isAuthenticated ? (
                 <button
                     onClick={handleLogout}
-                    className="rounded-full bg-white/10 px-10 py-3 font-semibold no-underline transition hover:bg-white/20"
+                    className="rounded-full bg-white/10 px-10 py-3"
                 >
-                    {isAuthenticated ? "Sign out" : "Sign in"}
+                    Sign out
                 </button>
+                ) : (
+                    <>
+                        <Link
+                            href="/api/auth/signin"
+                            className="rounded-full bg-white/10 px-10 py-3"
+                        >
+                            Sign in with Discord
+                        </Link>
+                        <Link
+                            href="/login"
+                            className="rounded-full bg-white/10 px-10 py-3"
+                        >
+                            Sign in with Email
+                        </Link>
+                    </>
+                )}
             </div>
         </div>
     );

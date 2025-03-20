@@ -1,17 +1,26 @@
 "use client"
-import { deleteProduct } from "~/app/products/[id]/actions/delete-product";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { api } from "~/trpc/react";
 
 export default function DeleteProductButton({ productId }: { productId: number }) {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
+  const deleteProductMutation = api.products.deleteProduct.useMutation({
+    onSuccess: () => {
+      router.push("/");
+    },
+    onError: (error) => {
+      setError("Failed to delete product. Please try again.");
+      console.error("Delete error:", error);
+    },
+  });
+
   async function handleDelete(event: React.FormEvent) {
     event.preventDefault();
     try {
-      await deleteProduct(productId);
-      router.push("/");
+      await deleteProductMutation.mutateAsync({ id: productId });
     } catch (err) {
       setError("Failed to delete product. Please try again.");
     }

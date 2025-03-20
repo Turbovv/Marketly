@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { api } from '~/trpc/react';
+import { TRPCClientError } from '@trpc/client';
 
 export interface JWTUser {
     id: string;
@@ -30,16 +31,20 @@ export interface JWTUser {
       { token: token || '' },
       { 
         enabled: !!token,
-        retry: false,
-        onError: (error: any) => {
-          if (error?.message === 'Invalid token' || error?.message?.includes('expired')) {
+            retry: false
+        }
+    );
+
+    useEffect(() => {
+        if (error instanceof TRPCClientError) {
+            if (error.message === 'Invalid token' || error.message.includes('expired')) {
             localStorage.removeItem('token');
             setJwtUser(null);
             setIsAuthenticated(false);
             window.location.href = '/login';
           }
         }
-      }
+      }, [error]
     );
   
     useEffect(() => {
