@@ -50,7 +50,6 @@ export const authRouter = createTRPCRouter({
       userType: 'jwt'
     }).returning();
 
-    // Send confirmation email
     await transporter.sendMail({
       from: `"UpMarket" <${EMAIL_USER}>`,
       to: input.email,
@@ -58,7 +57,6 @@ export const authRouter = createTRPCRouter({
       text: `Your confirmation code is: ${confirmationCode}`,
     });
 
-    // Generate JWT token
     const token = jwt.sign(
       { 
         userId: newUser?.id,
@@ -237,5 +235,12 @@ export const authRouter = createTRPCRouter({
           message: "Invalid token",
         });
       }
+    }),
+    logout: publicProcedure
+    .mutation(async ({ ctx }) => {
+      return {
+        success: true,
+        message: "Logged out successfully"
+      };
     }),
 });

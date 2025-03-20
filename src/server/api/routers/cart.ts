@@ -2,11 +2,16 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { eq } from "drizzle-orm";
 import { cart, products } from "~/server/db/schema";
+import { TRPCError } from "@trpc/server";
 
 export const cartRouter = createTRPCRouter({
   getCart: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session?.user?.id || ctx.jwtUser?.userId;
+        if (!userId) {
+          throw new TRPCError({ code: "UNAUTHORIZED" });
+        }
     return await ctx.db.query.cart.findMany({
-      where: eq(cart.userId, ctx.session.user.id),
+      where: eq(cart.userId, userId),
       with: {
         product: true,
       },
@@ -14,12 +19,14 @@ export const cartRouter = createTRPCRouter({
   }),
 
   addToCart: protectedProcedure
+  
     .input(
       z.object({
         productId: z.number(),
         quantity: z.number().min(1),
       })
     )
+    
     .mutation(async ({ ctx, input }) => {
       const product = await ctx.db.query.products.findFirst({
         where: eq(products.id, input.productId),
@@ -28,10 +35,16 @@ export const cartRouter = createTRPCRouter({
       if (!product) {
         throw new Error("Product not found");
       }
+      const userId = ctx.session?.user?.id || ctx.jwtUser?.userId;
+
+      if (!userId) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
 
       const existingItem = await ctx.db.query.cart.findFirst({
         where: eq(cart.productId, input.productId),
       });
+
 
       if (existingItem) {
         await ctx.db
@@ -41,7 +54,7 @@ export const cartRouter = createTRPCRouter({
       } else {
         await ctx.db.insert(cart).values({
           id: crypto.randomUUID(),
-          userId: ctx.session.user.id,
+          userId: userId,
           productId: input.productId,
           quantity: input.quantity,
           price: product.price,
@@ -60,8 +73,13 @@ export const cartRouter = createTRPCRouter({
       return { success: true };
     }),
     getCartCount: protectedProcedure.query(async ({ ctx }) => {
+      const userId = ctx.session?.user?.id || ctx.jwtUser?.userId;
+
+      if (!userId) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
       const count = await ctx.db.query.cart.findMany({
-        where: eq(cart.userId, ctx.session.user.id),
+        where: eq(cart.userId, userId),
       });
     
       return count.length;

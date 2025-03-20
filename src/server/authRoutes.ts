@@ -117,6 +117,9 @@ router.post("/login", async (req, res: any) => {
     if (!user.confirmed) {
       return res.status(400).json({ message: "Please confirm your email before logging in." });
     }
+    if (!user.password) {
+      return res.status(400).json({ message: "Invalid password" });
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
@@ -168,5 +171,11 @@ router.get("/dashboard", verifyToken, async (req, res: any) => {
     res.status(500).json({ message: "Internal server error", error: error.message });
   }
 });
-
+router.post("/logout", verifyToken, async (req, res: any) => {
+  try {
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error logging out" });
+  }
+});
 export default router;
