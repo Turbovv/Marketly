@@ -1,1 +1,0 @@
-ALTER TABLE "mymarket_user" ADD COLUMN "user_type" varchar(10) DEFAULT 'oauth' NOT NULL;

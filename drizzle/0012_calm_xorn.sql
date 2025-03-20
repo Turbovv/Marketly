@@ -1,1 +1,0 @@
-ALTER TABLE "mymarket_user" ADD COLUMN "confirmed" integer DEFAULT 0 NOT NULL;

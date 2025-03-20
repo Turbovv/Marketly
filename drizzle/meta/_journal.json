@@ -5,127 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1740400418654,
-      "tag": "0000_freezing_wolfpack",
+      "when": 1742486700485,
+      "tag": "0000_mute_korath",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1740408957981,
-      "tag": "0001_furry_morlocks",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1740409614074,
-      "tag": "0002_vengeful_revanche",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1740409744842,
-      "tag": "0003_lowly_lady_vermin",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1740409918046,
-      "tag": "0004_cuddly_nemesis",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1740410401223,
-      "tag": "0005_friendly_anthem",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1740582232959,
-      "tag": "0006_petite_pet_avengers",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1740658962988,
-      "tag": "0007_normal_iron_man",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "7",
-      "when": 1740661468418,
-      "tag": "0008_neat_jetstream",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "7",
-      "when": 1740667376807,
-      "tag": "0009_furry_aqueduct",
-      "breakpoints": true
-    },
-    {
-      "idx": 10,
-      "version": "7",
-      "when": 1740729561042,
-      "tag": "0010_tranquil_thunderbolt_ross",
-      "breakpoints": true
-    },
-    {
-      "idx": 11,
-      "version": "7",
-      "when": 1741381599315,
-      "tag": "0011_marvelous_blue_marvel",
-      "breakpoints": true
-    },
-    {
-      "idx": 12,
-      "version": "7",
-      "when": 1741433554734,
-      "tag": "0012_calm_xorn",
-      "breakpoints": true
-    },
-    {
-      "idx": 13,
-      "version": "7",
-      "when": 1741433840650,
-      "tag": "0013_mature_mordo",
-      "breakpoints": true
-    },
-    {
-      "idx": 14,
-      "version": "7",
-      "when": 1742372396809,
-      "tag": "0014_furry_silk_fever",
-      "breakpoints": true
-    },
-    {
-      "idx": 15,
-      "version": "7",
-      "when": 1742373318162,
-      "tag": "0015_acoustic_owl",
-      "breakpoints": true
-    },
-    {
-      "idx": 16,
-      "version": "7",
-      "when": 1742373361670,
-      "tag": "0016_curved_lady_bullseye",
-      "breakpoints": true
-    },
-    {
-      "idx": 17,
-      "version": "7",
-      "when": 1742373418895,
-      "tag": "0017_volatile_charles_xavier",
+      "when": 1742486740165,
+      "tag": "0001_complete_shooting_star",
       "breakpoints": true
     }
   ]

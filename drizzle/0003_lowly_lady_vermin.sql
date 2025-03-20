@@ -1,1 +1,0 @@
-ALTER TABLE "mymarket_cart" ALTER COLUMN "id" SET DATA TYPE text;

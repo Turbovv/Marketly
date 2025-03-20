@@ -1,1 +1,0 @@
-ALTER TABLE "mymarket_products" ADD COLUMN "category" varchar(255) NOT NULL;
