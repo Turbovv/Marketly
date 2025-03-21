@@ -18,6 +18,7 @@ const transporter = nodemailer.createTransport({
     pass: EMAIL_PASS,
   },
 });
+const CONFIRMATION_CODE_LENGTH = 6;
 
 export const authRouter = createTRPCRouter({
   register: publicProcedure
@@ -39,16 +40,21 @@ export const authRouter = createTRPCRouter({
     }
 
     const hashedPassword = await bcrypt.hash(input.password, 10);
-    const confirmationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const confirmationCode = Array.from(
+      { length: CONFIRMATION_CODE_LENGTH }, 
+      () => Math.floor(Math.random() * 10)
+    ).join('');
 
-    const [newUser] = await ctx.db.insert(users).values({
+    const token = jwt.sign({
       name: input.name,
       email: input.email,
       password: hashedPassword,
-      confirmed: 0,
       confirmationCode,
       userType: 'jwt'
-    }).returning();
+    }, 
+      JWT_SECRET,
+      { expiresIn: '15m' }
+    );
 
     await transporter.sendMail({
       from: `"UpMarket" <${EMAIL_USER}>`,
@@ -57,68 +63,65 @@ export const authRouter = createTRPCRouter({
       text: `Your confirmation code is: ${confirmationCode}`,
     });
 
-    const token = jwt.sign(
-      { 
-        userId: newUser?.id,
-        email: newUser?.email,
-        name: newUser?.name,
-        userType: 'jwt'
-      }, 
-      JWT_SECRET, 
-    );
-
     return { 
       token,
-      user: {
-        id: newUser?.id,
-        name: newUser?.name,
-        email: newUser?.email,
-        userType: 'jwt'
-      },
       message: "Please check your email for confirmation code"
     };
   }),
 
   confirmEmail: publicProcedure
     .input(z.object({
-      email: z.string().email(),
       confirmationCode: z.string(),
+    token: z.string(),
     }))
     .mutation(async ({ ctx, input }) => {
-      const user = await ctx.db.query.users.findFirst({
-        where: eq(users.email, input.email),
-      });
+    try {
+      const decoded = jwt.verify(input.token, JWT_SECRET) as {
+        name: string;
+        email: string;
+        password: string;
+        confirmationCode: string;
+        userType: string;
+      };
 
-      if (!user) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "User not found",
-        });
-      }
-
-      if (user.confirmed) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Email already confirmed",
-        });
-      }
-
-      if (user.confirmationCode !== input.confirmationCode) {
+      if (decoded.confirmationCode !== input.confirmationCode) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "Invalid confirmation code",
         });
       }
 
-      await ctx.db.update(users)
-        .set({ confirmed: 1 })
-        .where(eq(users.email, input.email));
+      const [newUser] = await ctx.db.insert(users).values({
+        name: decoded.name,
+        email: decoded.email,
+        password: decoded.password,
+        confirmed: 1,
+        userType: 'jwt'
+      }).returning();
 
-      const token = jwt.sign(
-        { userId: user.id }, 
+      const authToken = jwt.sign(
+        { 
+          userId: newUser?.id,
+          email: newUser?.email,
+          name: newUser?.name,
+          userType: 'jwt'
+        }, 
         JWT_SECRET
       );
-      return { token };
+
+     return { token: authToken };
+    } catch (error) {
+      if (error instanceof jwt.JsonWebTokenError) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Invalid or expired token. Please register again.",
+        });
+      }
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Something went wrong",
+      });
+    }
     }),
 
     login: publicProcedure

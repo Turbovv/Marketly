@@ -11,8 +11,8 @@ export default function RegisterPage() {
   const router = useRouter();
 
   const { mutate: register } = api.user.register.useMutation({
-    onSuccess: () => {
-      router.push("/confirm");
+    onSuccess: (data) => {
+      router.push(`/confirm?token=${data.token}`);
     },
     onError: (error) => {
       setError(error.message);
