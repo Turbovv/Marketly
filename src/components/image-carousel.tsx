@@ -7,11 +7,18 @@ import "swiper/css/free-mode";
 import "swiper/css/navigation";
 import { FreeMode, Navigation } from "swiper/modules";
 
-interface ProductImageCarouselProps {
-  images: string[];
-}
 
-const ProductImageCarousel: React.FC<ProductImageCarouselProps> = ({ images }) => {
+export default function ProductImageCarousel({ images }: { images: string[] }) {
+  if (images.length <= 1) {
+    return (
+      <img
+        src={images[0]}
+        alt="Product"
+        className="w-full h-auto rounded-lg"
+      />
+    );
+  }
+
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
@@ -73,5 +80,3 @@ const ProductImageCarousel: React.FC<ProductImageCarouselProps> = ({ images }) =
     </div>
   );
 };
-
-export default ProductImageCarousel;

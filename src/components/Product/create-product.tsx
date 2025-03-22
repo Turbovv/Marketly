@@ -35,38 +35,33 @@ export default function CreateProductPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
   
-    if (!isAuthenticated) {
-      console.error("User is not authenticated.");
+    if (!isAuthenticated || !imageUrls.length)
       return;
-    }
   
     try {
       const createdById = jwtUser?.id || nextAuthSession?.user?.id;
-  
-      if (!createdById) {
-        console.error("User ID not found");
+
+      if (!createdById) 
+
         return;
-      }
   
-      console.log("Creating product with user:", { jwtUser, nextAuthSession });
+      const mainImage: any = imageUrls[0];
+      const additionalImages = imageUrls.slice(1);
   
       await mutateAsync({
         name,
-        imageUrls,
+        imageUrls: additionalImages,
         desc,
         price: parseFloat(price.toString()),
         category,
         subcategory,
-        url: imageUrls[0] || "",
+        url: mainImage,
         createdById,
       });
       
       router.push("/");
     } catch (error) {
       console.error("Error creating product:", error);
-      if (error instanceof Error) {
-        console.error("Error details:", error.message);
-      }
     }
   };
 

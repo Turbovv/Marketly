@@ -43,13 +43,26 @@ export default function ProductDetailsPage() {
   if (!id || isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading product: {error.message}</div>;
 
-  const images = product ? [product.url, ...product.imageUrls] : [];
+  const images = product ? [
+    product.url,
+    ...(product.imageUrls ? product.imageUrls.filter(url => url !== product.url) : [])
+  ] : [];
   const existingConversation = conversations?.find((conv) => conv.sellerId === product?.createdById);
 
   return (
     <div className="container mx-auto p-8 md:p-12 grid grid-cols-1 md:grid-cols-2 gap-10">
-      <div className="space-y-4">
-        {product && <ProductImageCarousel images={images} />}
+     <div className="space-y-4">
+        {product && (
+          images.length > 1 ? (
+            <ProductImageCarousel images={images} />
+          ) : (
+            <img 
+              src={images[0]} 
+              alt={product.name} 
+              className="w-full h-auto rounded-lg"
+            />
+          )
+        )}
       </div>
       <ProductInfo product={product} userProducts={userProducts} />
       <ProductActions
