@@ -4,6 +4,20 @@ import { api } from "~/trpc/react";
 import { useRouter } from "next/navigation";
 import UploadThing from "../upload-thing";
 import { useAuth } from "~/hooks/useAuth";
+import {
+  Laptop,
+  Monitor,
+  Gamepad,
+  Guitar,
+  Piano,
+  Drum,
+  Paintbrush,
+  Smile,
+  Scissors,
+  Puzzle,
+  Shirt,
+  Package
+} from "lucide-react";
 
 export default function CreateProductPage() {
   const [name, setName] = useState("");
@@ -25,12 +39,40 @@ export default function CreateProductPage() {
 
   const router = useRouter();
 
-  const categoryOptions: Record<string, string[]> = {
-    Technic: ["Notebook", "Computers", "Game Consoles"],
-    Music: ["Guitars", "Pianos", "Drums"],
-    "Beauty and Fashion": ["Makeup", "Skincare", "Hair Products"],
-    "Children's Products": ["Toys", "Clothing", "Accessories"],
-  };
+  const categories = [
+    {
+      category: "Technic",
+      items: [
+        { name: "Laptops", icon: Laptop },
+        { name: "Computers", icon: Monitor },
+        { name: "Game Consoles", icon: Gamepad }
+      ]
+    },
+    {
+      category: "Music",
+      items: [
+        { name: "Guitars", icon: Guitar },
+        { name: "Pianos", icon: Piano },
+        { name: "Drums", icon: Drum }
+      ]
+    },
+    {
+      category: "Beauty and Fashion",
+      items: [
+        { name: "Makeup", icon: Paintbrush },
+        { name: "Skincare", icon: Smile },
+        { name: "Hair Products", icon: Scissors }
+      ]
+    },
+    {
+      category: "Children's Products",
+      items: [
+        { name: "Toys", icon: Puzzle },
+        { name: "Clothing", icon: Shirt },
+        { name: "Accessories", icon: Package }
+      ]
+    }
+  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -127,10 +169,11 @@ export default function CreateProductPage() {
             required
           >
             <option value="" disabled>Select a category</option>
-            <option value="Technic">Technic</option>
-            <option value="Music">Music</option>
-            <option value="Beauty and Fashion">Beauty and Fashion</option>
-            <option value="Children's Products">Children's Products</option>
+            {categories.map((cat) => (
+            <option key={cat.category} value={cat.category}>
+                {cat.category}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -145,9 +188,11 @@ export default function CreateProductPage() {
             >
               <option value="" disabled>Select a subcategory</option>
 
-              {categoryOptions[category]?.map((option, index) => (
-                <option key={index} value={option}>
-                  {option}
+              {categories
+                .find(cat => cat.category === category)
+                ?.items.map((item) => (
+                <option key={item.name} value={item.name}>
+                  {item.name}
                 </option>
               ))}
             </select>

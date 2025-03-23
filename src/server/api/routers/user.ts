@@ -214,7 +214,6 @@ export const authRouter = createTRPCRouter({
               userType: 'jwt'
             }, 
             JWT_SECRET, 
-            { expiresIn: "1h" }
           );
   
           return {

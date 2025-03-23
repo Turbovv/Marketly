@@ -99,11 +99,14 @@ export const productsRouter = createTRPCRouter({
 
   getCategories: publicProcedure.query(async ({ ctx }) => {
     const categories = await ctx.db
-      .select({ category: products.category })
+      .select({
+          category: products.category,
+          subcategory: products.subcategory
+        })
       .from(products)
-      .groupBy(products.category);
-
-    return categories.map((category) => category.category);
+      .groupBy(products.category, products.subcategory);
+  
+    return categories;
   }),
 
   similarProducts: publicProcedure
