@@ -29,6 +29,7 @@ export default function Navbar() {
         router.replace('/');
         router.refresh();
     };
+    const isHomePage = pathname === '/';
 
     if (pathname === "/login" || pathname === "/register" || pathname === "/confirm") {
         return null;
@@ -46,9 +47,11 @@ export default function Navbar() {
                         MyMarket
                     </Link>
 
+                    {!isHomePage && (
                     <div className="flex-1 max-w-2xl mx-8">
                         <SearchBar />
                     </div>
+                    )}
 
                     <div className="flex items-center gap-4">
                         {isAuthenticated ? (

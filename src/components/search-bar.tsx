@@ -12,6 +12,7 @@ export default function SearchBar() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const isHomePage = pathname === '/';
 
   useEffect(() => {
     if (pathname === '/search') {
@@ -61,12 +62,13 @@ export default function SearchBar() {
   };
 
   return (
-    <div className="relative w-full">
-      <div className="relative">
+    <div className="relative w-full max-w-7xl mx-auto">
+      <div className="flex items-center gap-3">
+        <div className={`relative ${isHomePage ? 'w-[70%]' : 'w-[40%]'}`}>
       <input
         ref={inputRef}
         type="text"
-        placeholder="Search for products..."
+        placeholder="Enter a search word"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onFocus={() => setIsFocused(true)}
@@ -74,12 +76,18 @@ export default function SearchBar() {
           setTimeout(() => setIsFocused(false), 150);
         }}
         onKeyDown={handleKeyDown}
-          className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className={`w-full pl-4 ${isHomePage ? 'py-5 border-yellow-400' : 'py-2 '} border-2 focus:outline-none rounded-xl text-base`}
         />
-        <Search 
-          className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" 
-          size={18}
-        />
+        </div>
+        {isHomePage && (
+          <button
+            onClick={handleSearch}
+            className="flex-1 flex items-center justify-center gap-2 py-5 px-8 rounded-xl bg-yellow-400 text-black text-base font-medium hover:bg-yellow-300 transition-colors"
+          >
+            <Search className="text-black" size={20} />
+            Search
+          </button>
+        )}
       </div>
 
       {isFocused && recentSearches.length > 0 && (
