@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
-import { X } from "lucide-react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { Search, X } from "lucide-react";
 
 export default function SearchBar() {
   const [query, setQuery] = useState("");
@@ -10,6 +10,19 @@ export default function SearchBar() {
   const [isFocused, setIsFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (pathname === '/search') {
+      const urlQuery = searchParams.get('query');
+      if (urlQuery) {
+        setQuery(urlQuery);
+      }
+    } else {
+      setQuery("");
+    }
+  }, [pathname, searchParams]);
 
   useEffect(() => {
     if (isFocused) {
@@ -48,7 +61,8 @@ export default function SearchBar() {
   };
 
   return (
-    <div className="w-full max-w-lg mx-auto">
+    <div className="relative w-full">
+      <div className="relative">
       <input
         ref={inputRef}
         type="text"
@@ -60,24 +74,26 @@ export default function SearchBar() {
           setTimeout(() => setIsFocused(false), 150);
         }}
         onKeyDown={handleKeyDown}
-        className="w-full p-2 border rounded text-black"
-      />
-      <button
-        onClick={handleSearch}
-        className="mt-2 w-full bg-blue-600 text-white py-2 rounded"
-      >
-        Search
-      </button>
+          className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+        />
+        <Search 
+          className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" 
+          size={18}
+        />
+      </div>
 
-      {isFocused && (
-        <div className="mt-4">
-          <p className="font-semibold">Recent Searches:</p>
-          <div className="grid">
+      {isFocused && recentSearches.length > 0 && (
+        <div className="absolute w-full mt-1 bg-white border rounded-lg shadow-lg z-50">
+          <div className="p-2">
+          <p className="text-xs text-gray-500 mb-2">Recent Searches</p>
             {recentSearches.map((term, idx) => (
-              <div key={idx} className="flex items-center space-y-2">
+              <div 
+                key={idx} 
+                onClick={() => handleRecentSearchClick(term)}
+                className="flex items-center justify-between px-2 py-1.5 hover:bg-gray-50 rounded cursor-pointer"
+              >
                 <span
-                  onClick={() => handleRecentSearchClick(term)}
-                  className="cursor-pointer text-blue-600 underline w-full"
+                  className="text-sm text-gray-700"
                 >
                   {term}
                 </span>
@@ -86,9 +102,9 @@ export default function SearchBar() {
                     e.stopPropagation();
                     handleDeleteSearch(term);
                   }}
-                  className="text-red-600 hover:text-red-800"
+                  className="text-gray-400 hover:text-gray-600"
                 >
-                  <X className="text-black" />
+                  <X size={14} />
                 </button>
               </div>
             ))}

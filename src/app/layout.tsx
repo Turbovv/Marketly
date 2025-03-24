@@ -6,6 +6,7 @@ import { type Metadata } from "next";
 import { TRPCReactProvider } from "~/trpc/react";
 import { SessionProvider } from "next-auth/react";
 import { Suspense } from "react";
+import Navbar from "~/components/navbar";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -22,6 +23,7 @@ export default function RootLayout({
         <SessionProvider>
           <TRPCReactProvider>
             <Suspense fallback={<div>Loading...</div>}>
+            <Navbar />
               {children}
             </Suspense>
           </TRPCReactProvider>
