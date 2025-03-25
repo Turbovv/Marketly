@@ -54,7 +54,7 @@ export default function ProductDetailsPage() {
      <div className="space-y-4">
         {product && (
           images.length > 1 ? (
-            <ProductImageCarousel images={images} />
+            <ProductImageCarousel images={images} showThumbnails={true} />
           ) : (
             <img 
               src={images[0]} 

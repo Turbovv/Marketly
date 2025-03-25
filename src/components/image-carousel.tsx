@@ -1,61 +1,70 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { FreeMode, Navigation } from "swiper/modules";
+import { cn } from "~/lib/utils";
 import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/navigation";
-import { FreeMode, Navigation } from "swiper/modules";
 
+interface ProductImageCarouselProps {
+  images: string[];
+  className?: string;
+  showThumbnails?: boolean;
+}
 
-export default function ProductImageCarousel({ images }: { images: string[] }) {
+export default function ProductImageCarousel({ 
+  images, 
+  className,
+  showThumbnails = false 
+}: ProductImageCarouselProps) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
   if (images.length <= 1) {
     return (
       <img
         src={images[0]}
         alt="Product"
-        className="w-full h-auto rounded-lg"
+        className={cn("w-full object-cover", className)}
       />
     );
   }
 
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft") prevImage();
-      if (e.key === "ArrowRight") nextImage();
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [currentIndex]);
-
-  const prevImage = () => setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-  const nextImage = () => setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
-
   return (
-    <div className="relative border rounded-lg shadow-lg overflow-hidden">
+    <div className={cn("relative", className)}>
+    <div className="relative w-full h-full">
       <img
         src={images[currentIndex]}
-        alt="Main Product"
-        className="w-full h-[400px] object-cover rounded-md shadow-md"
+        alt="Product"
+        className="w-full h-full object-cover"
       />
-
+        <div className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-200">
       <button
-        onClick={prevImage}
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white p-3 rounded-full shadow-lg hover:bg-gray-700 transition"
+        onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setCurrentIndex(prev => prev === 0 ? images.length - 1 : prev - 1);
+            }}
+        className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1.5 hover:bg-white transition-colors z-10"
       >
-        ◀
+            <ChevronLeft className="w-4 h-4 text-gray-800" />
       </button>
-
-      <button
-        onClick={nextImage}
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-gray-800 text-white p-3 rounded-full shadow-lg hover:bg-gray-700 transition"
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setCurrentIndex(prev => prev === images.length - 1 ? 0 : prev + 1);
+            }}
+        className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1.5 hover:bg-white transition-colors z-10"
       >
-        ▶
+            <ChevronRight className="w-4 h-4 text-gray-800" />
       </button>
+        </div>
+      </div>
 
+      {showThumbnails && (
       <Swiper
         slidesPerView={4}
         spaceBetween={10}
@@ -69,14 +78,16 @@ export default function ProductImageCarousel({ images }: { images: string[] }) {
             <img
               src={image}
               alt={`Thumbnail ${index + 1}`}
-              className={`w-full h-20 object-cover rounded-md cursor-pointer ${
-                currentIndex === index ? "border-2 border-blue-600" : ""
-              }`}
+              className={cn(
+                  "w-full h-20 object-cover rounded-md cursor-pointer",
+                currentIndex === index && "border-2 border-blue-600"
+                )}
               onClick={() => setCurrentIndex(index)}
             />
           </SwiperSlide>
         ))}
       </Swiper>
+      )}
     </div>
   );
 };
