@@ -5,10 +5,10 @@ import { users, products } from "~/server/db/schema";
 
 export const profileRouter = createTRPCRouter({
   getUserProfile: publicProcedure
-    .input(z.object({ userId: z.string() }))
+    .input(z.object({ username: z.string() }))
     .query(async ({ ctx, input }) => {
       const user = await ctx.db.query.users.findFirst({
-        where: eq(users.id, input.userId),
+        where: eq(users.name, input.username),
       });
 
       if (!user) throw new Error("User not found");
@@ -19,8 +19,9 @@ export const profileRouter = createTRPCRouter({
   getUserProducts: publicProcedure
     .input(z.object({ userId: z.string() }))
     .query(async ({ ctx, input }) => {
-      return await ctx.db.query.products.findMany({
+      const productsList = await ctx.db.query.products.findMany({
         where: eq(products.createdById, input.userId),
       });
+      return productsList || [];
     }),
 });

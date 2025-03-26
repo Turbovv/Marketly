@@ -1,5 +1,4 @@
 "use client";
-import React from 'react'
 import Link from "next/link";
 import SearchBar from "~/components/search-bar";
 import { usePathname, useRouter } from "next/navigation";
@@ -77,10 +76,11 @@ export default function Navbar() {
                                     </div>
                                 </Link>
                                 <Link
-                                    href="/dashboard"
+                                    href={`/settings/${jwtUser?.name}`}
                                     className="flex items-center gap-2 text-gray-700 hover:text-blue-600"
                                 >
                                     <User size={20} />
+                                    <span className="text-sm">Settings</span>
                                 </Link>
                                 <button
                                     onClick={handleLogout}
