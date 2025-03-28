@@ -88,7 +88,7 @@ export default function CreateProductPage() {
         return;
   
       const mainImage: any = imageUrls[0];
-      const additionalImages = imageUrls.slice(1);
+      const additionalImages = imageUrls.length > 1 ? imageUrls.slice(1) : null;
   
       await mutateAsync({
         name,
