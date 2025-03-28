@@ -15,6 +15,7 @@ export default function LoginPage() {
     onSuccess: (data) => {
       localStorage.setItem("token", data.token);
       router.push("/dashboard");
+      router.refresh();
     },
     onError: (error) => {
       setError(error.message);

@@ -7,6 +7,7 @@
   import SortDropdown from "~/components/sort-dropdown";
   import { sortProducts } from "~/utils/sortProducts";
   import { ChevronRight, User, ShoppingCart, Heart, MessageSquare, LogOut } from "lucide-react";
+import LogOutButton from "~/components/log-out";
 
   export default function UserSettingsPage() {
     const params = useParams();
@@ -65,12 +66,11 @@
     </li>
   </ul>
   <hr className="my-4" />
-  <button
-    // onClick={handleLogout} // Replace with your actual logout function
+  <div
     className="flex items-center gap-3 p-2 w-full rounded-md cursor-pointer"
   >
-    <LogOut className="w-5 h-5" /> Logout
-  </button>
+    <LogOutButton />
+  </div>
             
           </aside>
 

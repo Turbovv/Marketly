@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "~/hooks/useAuth";
 import { api } from "~/trpc/react";
 import { ShoppingCart, Plus, User, LogOut } from "lucide-react";
+import LogOutButton from "./log-out";
 
 export default function Navbar() {
     const { jwtUser, nextAuthSession, isAuthenticated } = useAuth();
@@ -14,15 +15,6 @@ export default function Navbar() {
     const { data: cartCount = 0 } = api.cart.getCartCount.useQuery(undefined, {
         enabled: isAuthenticated
     });
-
-    const handleLogout = () => {
-        if (jwtUser) {
-            localStorage.removeItem("token");
-            router.push("/login");
-        } else if (nextAuthSession) {
-            router.push("/api/auth/signout");
-        }
-    };
     const handleLogoClick = async (e: React.MouseEvent) => {
         e.preventDefault();
         router.replace('/');
@@ -82,12 +74,6 @@ export default function Navbar() {
                                     <User size={20} />
                                     <span className="text-sm">Settings</span>
                                 </Link>
-                                <button
-                                    onClick={handleLogout}
-                                    className="flex items-center gap-2 text-gray-700 hover:text-blue-600"
-                                >
-                                    <LogOut size={20} />
-                                </button>
                             </>
                         ) : (
                             <div className="flex items-center gap-4">

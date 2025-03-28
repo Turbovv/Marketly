@@ -102,6 +102,7 @@ export default function CreateProductPage() {
       });
       
       router.push("/");
+      router.refresh()
     } catch (error) {
       console.error("Error creating product:", error);
     }
