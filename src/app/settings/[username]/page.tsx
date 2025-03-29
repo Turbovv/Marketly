@@ -11,10 +11,12 @@ import LogOutButton from "~/components/log-out";
 
   export default function UserSettingsPage() {
     const params = useParams();
-    const username = params.username as string;
     const [sortOption, setSortOption] = useState("");
 
-    const { data: user, isLoading: userLoading, isError: userError } = api.profile.getUserProfile.useQuery({ username });
+    const { data: user, isLoading: userLoading, isError: userError } = api.user.getUser.useQuery(
+      { token: typeof window !== 'undefined' ? localStorage.getItem("token") || "" : "" },
+      { enabled: typeof window !== 'undefined' && !!localStorage.getItem("token") }
+    );
 
     const { data: products, isLoading: productsLoading } = api.profile.getUserProducts.useQuery(
       { userId: user?.id },

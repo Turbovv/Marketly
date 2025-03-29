@@ -3,7 +3,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "~/trpc/react";
 import Link from "next/link";
-import Image from "next/image";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -14,7 +13,7 @@ export default function LoginPage() {
   const { mutate: login } = api.user.login.useMutation({
     onSuccess: (data) => {
       localStorage.setItem("token", data.token);
-      router.push("/dashboard");
+      router.push(`/`);
       router.refresh();
     },
     onError: (error) => {
