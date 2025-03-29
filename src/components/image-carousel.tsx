@@ -34,7 +34,7 @@ export default function ProductImageCarousel({
 
   return (
     <div className={cn("relative", className)}>
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-full aspect-[4/3]">
       <img
         src={images[currentIndex]}
         alt="Product"

@@ -53,6 +53,7 @@ export default function Chat({
       if (data.conversationId === conversationId) {
         alert("This conversation has been deleted.");
         router.push("/chat");
+        router.refresh()
       }
     });
 

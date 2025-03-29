@@ -35,6 +35,7 @@ export default function DeleteConversationButton({ conversationId }: DeleteConve
       } finally {
         setIsDeleting(false);
         router.push("/chat")
+        router.refresh()
       }
     }
   };

@@ -56,11 +56,13 @@ export default function ProductDetailsPage() {
           images.length > 1 ? (
             <ProductImageCarousel images={images} showThumbnails={true} />
           ) : (
+            <div className="w-full aspect-[4/3] overflow-hidden rounded-lg">
             <img 
               src={images[0]} 
               alt={product.name} 
-              className="w-full h-auto rounded-lg"
+              className="w-full h-full object-cover"
             />
+            </div>
           )
         )}
       </div>

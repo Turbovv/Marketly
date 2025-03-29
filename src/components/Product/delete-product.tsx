@@ -10,6 +10,7 @@ export default function DeleteProductButton({ productId }: { productId: number }
   const deleteProductMutation = api.products.deleteProduct.useMutation({
     onSuccess: () => {
       router.push("/");
+      router.refresh()
     },
     onError: (error) => {
       setError("Failed to delete product. Please try again.");
