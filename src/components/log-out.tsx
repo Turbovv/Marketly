@@ -8,7 +8,7 @@ const router = useRouter();
     const handleLogout = () => {
         if (jwtUser) {
             localStorage.removeItem("token");
-            router.push("/login");
+            router.push("/");
         } else if (nextAuthSession) {
             router.push("/api/auth/signout");
         }

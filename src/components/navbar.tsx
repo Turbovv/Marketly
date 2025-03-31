@@ -4,8 +4,8 @@ import SearchBar from "~/components/search-bar";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "~/hooks/useAuth";
 import { api } from "~/trpc/react";
-import { ShoppingCart, Plus, User, LogOut } from "lucide-react";
-import LogOutButton from "./log-out";
+import { ShoppingCart, Plus } from "lucide-react";
+import { Dropdown } from "./dropdown";
 
 export default function Navbar() {
     const { jwtUser, nextAuthSession, isAuthenticated } = useAuth();
@@ -17,7 +17,7 @@ export default function Navbar() {
     });
     const handleLogoClick = async (e: React.MouseEvent) => {
         e.preventDefault();
-        router.replace('/');
+        router.push('/');
         router.refresh();
     };
     const isHomePage = pathname === '/';
@@ -67,13 +67,7 @@ export default function Navbar() {
                                         )}
                                     </div>
                                 </Link>
-                                <Link
-                                    href={`/settings/${jwtUser?.name}`}
-                                    className="flex items-center gap-2 text-gray-700 hover:text-blue-600"
-                                >
-                                    <User size={20} />
-                                    <span className="text-sm">Settings</span>
-                                </Link>
+                               <Dropdown />
                             </>
                         ) : (
                             <div className="flex items-center gap-4">
