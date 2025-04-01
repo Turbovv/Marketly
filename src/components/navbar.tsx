@@ -8,7 +8,7 @@ import { ShoppingCart, Plus } from "lucide-react";
 import { Dropdown } from "./dropdown";
 
 export default function Navbar() {
-    const { jwtUser, nextAuthSession, isAuthenticated } = useAuth();
+    const {isAuthenticated } = useAuth();
     const pathname = usePathname();
     const router = useRouter();
 
@@ -18,7 +18,7 @@ export default function Navbar() {
     const handleLogoClick = async (e: React.MouseEvent) => {
         e.preventDefault();
         router.push('/');
-        router.refresh();
+        window.location.href = "/"
     };
     const isHomePage = pathname === '/';
 

@@ -2,14 +2,14 @@ import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "~/hooks/useAuth";
 export default function LogOutButton() {
-const { jwtUser, nextAuthSession } = useAuth();
+const { authUser } = useAuth();
 const router = useRouter();
 
     const handleLogout = () => {
-        if (jwtUser) {
+        if (authUser?.userType === "jwt") {
             localStorage.removeItem("token");
             router.push("/");
-        } else if (nextAuthSession) {
+        } else if (authUser?.userType === "next-auth") {
             router.push("/api/auth/signout");
         }
     };

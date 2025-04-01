@@ -6,25 +6,22 @@
   import { useState } from "react";
   import SortDropdown from "~/components/sort-dropdown";
   import { sortProducts } from "~/utils/sortProducts";
-  import { ChevronRight, User, ShoppingCart, Heart, MessageSquare, LogOut } from "lucide-react";
-import LogOutButton from "~/components/log-out";
+  import { ChevronRight, User, ShoppingCart, Heart, MessageSquare } from "lucide-react";
+  import LogOutButton from "~/components/log-out";
+  import { useAuth } from "~/hooks/useAuth";
 
   export default function UserSettingsPage() {
     const params = useParams();
     const [sortOption, setSortOption] = useState("");
 
-    const { data: user, isLoading: userLoading, isError: userError } = api.user.getUser.useQuery(
-      { token: typeof window !== 'undefined' ? localStorage.getItem("token") || "" : "" },
-      { enabled: typeof window !== 'undefined' && !!localStorage.getItem("token") }
-    );
+    const { authUser, isAuthenticated } = useAuth();
 
     const { data: products, isLoading: productsLoading } = api.profile.getUserProducts.useQuery(
-      { userId: user?.id },
-      { enabled: !!user?.id }
+      { userId: authUser?.id as string },
+      { enabled: !!authUser?.id }
     );
 
-    if (userLoading) return <div className="flex h-screen items-center justify-center">Loading profile...</div>;
-    if (userError) return <div className="flex h-screen items-center justify-center text-red-500">User not found</div>;
+    if (!isAuthenticated) { return <div className="flex h-screen items-center justify-center text-red-500">User not found</div>;}
 
     const sortedProducts = sortProducts(products || [], sortOption);
 
@@ -35,17 +32,17 @@ import LogOutButton from "~/components/log-out";
           <aside className="bg-white shadow-md rounded-lg p-6">
             <div className="flex items-center gap-3 border p-2 rounded-lg">
     <img
-      src={user?.image || "/user-male.svg"}
+      src={authUser?.image ?? "/user-male.svg"}
       alt="Profile"
       className="w-12 h-12 rounded-full border border-gray-300"
     />
 
     <div className="flex flex-col">
       <h1 className="text-base font-semibold text-gray-900 truncate max-w-[150px]">
-        {user?.name}
-      </h1>
+        {authUser?.name}
+      </h1> 
       <p className="text-sm text-blue-600 truncate max-w-[150px] overflow-hidden whitespace-nowrap">
-        {user?.email}
+        {authUser?.email}
       </p>
     </div>
   </div>

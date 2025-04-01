@@ -8,12 +8,14 @@ export interface JWTUser {
     name: string;
     email: string;
     userType: string;
+    image?: string;
   }
   
   export interface NextAuthUser {
     id: string;
     name: string | null;
     email: string;
+    image?: string;
   }
   
   export const useAuth = () => {
@@ -61,10 +63,28 @@ export interface JWTUser {
       }
     }, [userData, nextAuthSession]);
   
+  const authUser = nextAuthSession?.user
+    ? {
+        id: nextAuthSession.user.id || "",
+        name: nextAuthSession.user.name || "Guest",
+        email: nextAuthSession.user.email || "",
+        image: nextAuthSession.user.image || "/user-male.svg", 
+        userType: "next-auth",
+      }
+    : jwtUser
+    ? {
+        id: jwtUser.id,
+        name: jwtUser.name,
+        email: jwtUser.email,
+        image: jwtUser.image || "/user-male.svg",
+        userType: "jwt",
+      }
+    : null;
+  
     return {
       isAuthenticated,
-      userId: jwtUser?.id || nextAuthSession?.user?.id,
-      jwtUser,
-      nextAuthSession,
+      userId: authUser?.id,
+    authUser,
+    userType: authUser?.userType,
     };
   };

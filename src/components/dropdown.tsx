@@ -14,7 +14,7 @@ import LogOutButton from "~/components/log-out";
 import Link from "next/link";
 
 export function Dropdown() {
-    const { jwtUser } = useAuth();
+    const { authUser} = useAuth();
     const [isOpen, setIsOpen] = useState(false);
 
     return (
@@ -22,24 +22,24 @@ export function Dropdown() {
             <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="py-5">
                     <img
-                        src={jwtUser?.image || "/user-male.svg"}
+                        src={authUser?.image || "/user-male.svg"}
                         alt="Profile"
                         className="w-7 h-7 rounded-full border border-gray-300"
                     />
-                    <span>{jwtUser?.name}</span>
+                    <span>{authUser?.name}</span>
                     {isOpen ? <ChevronUp /> : <ChevronDown />}
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
                 <div className="py-2 px-4 flex gap-3">
                 <img
-                        src={jwtUser?.image || "/user-male.svg"}
+                        src={authUser?.image || "/user-male.svg"}
                         alt="Profile"
                         className="rounded-full"
                     />
                    <div className="">
-                   <h1 className="text-base font-semibold text-gray-900">{jwtUser?.name}</h1>
-                   <p className="text-sm text-blue-600 truncate w-[160px]">{jwtUser?.email}</p>
+                   <h1 className="text-base font-semibold text-gray-900">{authUser?.name}</h1>
+                   <p className="text-sm text-blue-600 truncate w-[160px]">{authUser?.email}</p>
                    </div>
                 </div>
                 <DropdownMenuSeparator />
