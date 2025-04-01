@@ -15,29 +15,26 @@ export default function Chat({
   conversationId: number;
   currentUserId: string;
 }) {
-  const { jwtUser, nextAuthSession, isAuthenticated } = useAuth();
-  const userName = jwtUser?.name || nextAuthSession?.user?.name;
+  const { authUser, isAuthenticated } = useAuth();
+  const userName = authUser?.name ?? "Unknown User";
+  
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<any[]>([]);
-  const [socket, setSocket] = useState<any>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [allMessages, setAllMessages] = useState<
+    { id: number | string; content: string; senderId: string; senderName: string | null; createdAt: string }[]
+  >([]);
+  
+  const messageContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const [socket, setSocket] = useState<any>(null);
+
   const { data: chatMessages, refetch } = api.chat.getMessages.useQuery(
     { conversationId },
     { enabled: isAuthenticated }
   );
 
   const sendMessageMutation = api.chat.sendMessage.useMutation({
-    onSuccess: () => {
-      refetch();
-    },
+    onSuccess: () => refetch(),
   });
-
-  const [allMessages, setAllMessages] = useState<
-    { id: number | string; content: string; senderId: string; senderName: string | null; createdAt: string }[]
-  >([]);
-
-  const messageContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const newSocket = io("http://localhost:3001");
@@ -60,7 +57,7 @@ export default function Chat({
     return () => {
       newSocket.disconnect();
     };
-  }, [conversationId]);
+  }, [conversationId, router]);
 
   useEffect(() => {
     if (chatMessages) {

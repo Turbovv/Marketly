@@ -9,7 +9,7 @@ import { useAuth } from "~/hooks/useAuth";
 export default function ChatPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { jwtUser, nextAuthSession, isAuthenticated, userId } = useAuth();
+  const {isAuthenticated, userId } = useAuth();
 
   const conversationId = searchParams.get("conversationId");
   const [selectedConversation, setSelectedConversation] = useState<number | null>(null);

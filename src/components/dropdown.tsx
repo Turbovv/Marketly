@@ -45,7 +45,7 @@ export function Dropdown() {
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                     <DropdownMenuItem asChild>
-                        <Link href="/settings/profile" className="flex items-center gap-3">
+                        <Link href={`/settings/${authUser?.name}`}className="flex items-center gap-3">
                             <User className="w-5 h-5" /> Profile
                         </Link>
                     </DropdownMenuItem>

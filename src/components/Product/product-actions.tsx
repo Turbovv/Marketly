@@ -12,11 +12,9 @@ export default function ProductActions({
 }: any) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [message, setMessage] = useState("");
-  const { userId, jwtUser, nextAuthSession, isAuthenticated } = useAuth();
+  const { userId, isAuthenticated } = useAuth();
 
-  const isOwner = userId === product?.createdById ||
-    nextAuthSession?.user?.id === product?.createdById ||
-    jwtUser?.id === product?.createdById;
+  const isOwner = userId === product?.createdById;
 
   const sendMessage = api.chat.sendMessage.useMutation();
   const createConversationMutation = api.chat.createConversation.useMutation();

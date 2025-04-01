@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { api } from "~/trpc/react";
 import { useRouter } from "next/navigation";
 import UploadThing from "../upload-thing";
@@ -26,17 +26,8 @@ export default function CreateProductPage() {
   const [category, setCategory] = useState("");
   const [subcategory, setSubCategory] = useState("");
   const [imageUrls, setImageUrls] = useState<string[]>([]);
-  
-  const { isAuthenticated, userId, jwtUser, nextAuthSession } = useAuth();
+  const { isAuthenticated, userId } = useAuth();
   const { mutateAsync } = api.products.createProduct.useMutation();
-  const [authChecked, setAuthChecked] = useState(false);
-
-  useEffect(() => {
-    if (jwtUser || nextAuthSession?.user) {
-      setAuthChecked(true);
-    }
-  }, [jwtUser, nextAuthSession]);
-
   const router = useRouter();
 
   const categories = [
@@ -79,17 +70,11 @@ export default function CreateProductPage() {
   
     if (!isAuthenticated || !imageUrls.length)
       return;
-  
     try {
-      const createdById = jwtUser?.id || nextAuthSession?.user?.id;
+      if (!userId) return;
 
-      if (!createdById) 
-
-        return;
-  
       const mainImage: any = imageUrls[0];
       const additionalImages = imageUrls.length > 1 ? imageUrls.slice(1) : null;
-  
       await mutateAsync({
         name,
         imageUrls: additionalImages,
@@ -98,9 +83,8 @@ export default function CreateProductPage() {
         category,
         subcategory,
         url: mainImage,
-        createdById,
+        createdById: userId,
       });
-      
       router.push("/");
       router.refresh()
     } catch (error) {
@@ -110,16 +94,6 @@ export default function CreateProductPage() {
 
   const removeImage = (index: number) => {
     setImageUrls((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedCategory = e.target.value;
-    setCategory(selectedCategory);
-    setSubCategory("");
-  };
-
-  const handleSubCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSubCategory(e.target.value);
   };
 
   return (
@@ -165,7 +139,10 @@ export default function CreateProductPage() {
           <label className="block mb-2">Category</label>
           <select
             value={category}
-            onChange={handleCategoryChange}
+            onChange={(e) => {
+              setCategory(e.target.value);
+              setSubCategory("");
+            }}
             className="w-full p-2 border border-gray-300 rounded bg-white"
             required
           >
@@ -183,14 +160,14 @@ export default function CreateProductPage() {
             <label className="block mb-2">Choose a Subcategory</label>
             <select
               value={subcategory}
-              onChange={handleSubCategoryChange}
+              onChange={(e) => setSubCategory(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded bg-white"
               required
             >
               <option value="" disabled>Select a subcategory</option>
 
               {categories
-                .find(cat => cat.category === category)
+                .find((cat) => cat.category === category)
                 ?.items.map((item) => (
                 <option key={item.name} value={item.name}>
                   {item.name}

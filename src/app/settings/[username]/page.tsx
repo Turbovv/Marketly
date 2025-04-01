@@ -8,20 +8,23 @@
   import { sortProducts } from "~/utils/sortProducts";
   import { ChevronRight, User, ShoppingCart, Heart, MessageSquare } from "lucide-react";
   import LogOutButton from "~/components/log-out";
-  import { useAuth } from "~/hooks/useAuth";
 
   export default function UserSettingsPage() {
     const params = useParams();
     const [sortOption, setSortOption] = useState("");
 
-    const { authUser, isAuthenticated } = useAuth();
+    const { data: userProfile, isLoading: userLoading } = api.profile.getUserProfile.useQuery(
+    { username: params.username as string },
+    { enabled: !!params.username }
+  );
 
     const { data: products, isLoading: productsLoading } = api.profile.getUserProducts.useQuery(
-      { userId: authUser?.id as string },
-      { enabled: !!authUser?.id }
+      { userId: userProfile?.id as string },
+      { enabled: !!userProfile?.id }
     );
 
-    if (!isAuthenticated) { return <div className="flex h-screen items-center justify-center text-red-500">User not found</div>;}
+  if (userLoading) return <div>Loading profile...</div>;
+  if (!userProfile) return <div className="flex h-screen items-center justify-center text-red-500">User not found</div>;
 
     const sortedProducts = sortProducts(products || [], sortOption);
 
@@ -32,21 +35,19 @@
           <aside className="bg-white shadow-md rounded-lg p-6">
             <div className="flex items-center gap-3 border p-2 rounded-lg">
     <img
-      src={authUser?.image ?? "/user-male.svg"}
+      src={userProfile?.image ?? "/user-male.svg"}
       alt="Profile"
       className="w-12 h-12 rounded-full border border-gray-300"
     />
-
     <div className="flex flex-col">
       <h1 className="text-base font-semibold text-gray-900 truncate max-w-[150px]">
-        {authUser?.name}
+        {userProfile?.name}
       </h1> 
       <p className="text-sm text-blue-600 truncate max-w-[150px] overflow-hidden whitespace-nowrap">
-        {authUser?.email}
+        {userProfile?.email}
       </p>
     </div>
   </div>
-
   <ul className="mt-4 space-y-2 text-gray-700">
     <li className="flex items-center gap-3 p-2 rounded-md">
       <User className="w-5 h-5" /> Profile
@@ -82,7 +83,7 @@
 
             <div className="border-t pt-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold">Your Products</h2>
+                <h2 className="text-lg font-semibold">{userProfile?.name}'s Products</h2>
                 <SortDropdown sortOption={sortOption} setSortOption={setSortOption} />
               </div>
 

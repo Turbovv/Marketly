@@ -14,7 +14,7 @@ export default function LoginPage() {
     onSuccess: (data) => {
       localStorage.setItem("token", data.token);
       router.push(`/`);
-      router.refresh();
+      window.location.href = "/";
     },
     onError: (error) => {
       setError(error.message);

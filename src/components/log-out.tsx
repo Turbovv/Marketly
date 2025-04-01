@@ -9,6 +9,7 @@ const router = useRouter();
         if (authUser?.userType === "jwt") {
             localStorage.removeItem("token");
             router.push("/");
+            window.location.href = "/"
         } else if (authUser?.userType === "next-auth") {
             router.push("/api/auth/signout");
         }
