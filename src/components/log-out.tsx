@@ -1,3 +1,4 @@
+"use client"
 import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "~/hooks/useAuth";
