@@ -17,7 +17,7 @@ export default function Sidebar() {
         />
         <div className="flex flex-col">
           <h1 className="text-lg font-semibold text-gray-900">{authUser?.name}</h1>
-          <p className="text-sm text-blue-600">{authUser?.email}</p>
+          <p className="text-sm text-blue-600 truncate max-w-[150px]">{authUser?.email}</p>
         </div>
       </div>
 

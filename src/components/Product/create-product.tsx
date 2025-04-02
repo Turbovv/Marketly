@@ -16,13 +16,14 @@ import {
   Scissors,
   Puzzle,
   Shirt,
-  Package
+  Package,
+  Trash2,
 } from "lucide-react";
 
 export default function CreateProductPage() {
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
-  const [price, setPrice] = useState(0);
+  const [price, setPrice] = useState("");
   const [category, setCategory] = useState("");
   const [subcategory, setSubCategory] = useState("");
   const [imageUrls, setImageUrls] = useState<string[]>([]);
@@ -36,38 +37,37 @@ export default function CreateProductPage() {
       items: [
         { name: "Laptops", icon: Laptop },
         { name: "Computers", icon: Monitor },
-        { name: "Game Consoles", icon: Gamepad }
-      ]
+        { name: "Game Consoles", icon: Gamepad },
+      ],
     },
     {
       category: "Music",
       items: [
         { name: "Guitars", icon: Guitar },
         { name: "Pianos", icon: Piano },
-        { name: "Drums", icon: Drum }
-      ]
+        { name: "Drums", icon: Drum },
+      ],
     },
     {
       category: "Beauty and Fashion",
       items: [
         { name: "Makeup", icon: Paintbrush },
         { name: "Skincare", icon: Smile },
-        { name: "Hair Products", icon: Scissors }
-      ]
+        { name: "Hair Products", icon: Scissors },
+      ],
     },
     {
       category: "Children's Products",
       items: [
         { name: "Toys", icon: Puzzle },
         { name: "Clothing", icon: Shirt },
-        { name: "Accessories", icon: Package }
-      ]
-    }
+        { name: "Accessories", icon: Package },
+      ],
+    },
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
     if (!isAuthenticated || !imageUrls.length)
       return;
     try {
@@ -79,7 +79,7 @@ export default function CreateProductPage() {
         name,
         imageUrls: additionalImages,
         desc,
-        price: parseFloat(price.toString()),
+        price: price ? parseFloat(price) : 0,
         category,
         subcategory,
         url: mainImage,
@@ -97,53 +97,56 @@ export default function CreateProductPage() {
   };
 
   return (
-    <div className="max-w-lg mx-auto p-6 border border-gray-300 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-semibold mb-4">Add a New Product</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block mb-2">Product Name</label>
+    <div className="max-w-2xl mx-auto p-8 bg-white shadow-lg rounded-lg border border-gray-200">
+      <h2 className="text-3xl font-semibold mb-8 text-gray-800">Add an advertisement</h2>
+      <p className="font-bold mb-4">Product details</p>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div>
+          <label className="text-sm text-gray-700 mb-1">Title</label>
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
             required
           />
         </div>
 
-        <div className="mb-4">
-          <label className="block mb-2">Description</label>
+        <div>
+          <label className="block text-sm text-gray-700  mb-1">Description</label>
           <textarea
             value={desc}
             onChange={(e) => setDesc(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded resize-none"
+            className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 outline-none"
             rows={4}
             required
           />
         </div>
 
-        <div className="mb-4">
-          <label className="block mb-2">Price</label>
+        <div>
+          <label className="block text-sm text-gray-700 font-medium mb-1">Price</label>
           <input
-            type="number"
+            type="text"
             value={price}
-            onChange={(e) => setPrice(Math.max(0, parseFloat(e.target.value)))}
-            className="w-full p-2 border border-gray-300 rounded appearance-none"
+            onChange={(e) => {
+              const newValue = e.target.value.replace(/\D/g, "");
+              setPrice(newValue);
+            }}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none 
+             appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            placeholder="0"
             required
-            step="0.01"
-            min="0"
           />
         </div>
-
-        <div className="mb-4">
-          <label className="block mb-2">Category</label>
+        <div>
+          <label className="block text-sm text-gray-700 font-medium mb-1">Choose/type Category *</label>
           <select
             value={category}
             onChange={(e) => {
               setCategory(e.target.value);
               setSubCategory("");
             }}
-            className="w-full p-2 border border-gray-300 rounded bg-white"
+            className="w-full p-3 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 outline-none"
             required
           >
             <option value="" disabled>Select a category</option>
@@ -156,16 +159,15 @@ export default function CreateProductPage() {
         </div>
 
         {category && (
-          <div className="mb-4">
-            <label className="block mb-2">Choose a Subcategory</label>
+          <div>
+            <label className="block text-sm text-gray-700 font-medium mb-1">Subcategory</label>
             <select
               value={subcategory}
               onChange={(e) => setSubCategory(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded bg-white"
+              className="w-full p-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 outline-none"
               required
             >
               <option value="" disabled>Select a subcategory</option>
-
               {categories
                 .find((cat) => cat.category === category)
                 ?.items.map((item) => (
@@ -177,8 +179,8 @@ export default function CreateProductPage() {
           </div>
         )}
 
-        <div className="mb-4">
-          <label className="block mb-2">Upload Product Image</label>
+        <div>
+          <label className="block text-sm text-gray-700 font-medium mb-2">Upload Product Images</label>
           <UploadThing
             onUploadComplete={(files) => {
               setImageUrls((prev) => [...prev, ...files.map((file) => file.url)]);
@@ -186,29 +188,32 @@ export default function CreateProductPage() {
             onUploadError={(error) => alert(error.message)}
           />
         </div>
-
         {imageUrls.length > 0 && (
           <div className="flex flex-wrap gap-4">
             {imageUrls.map((url, index) => (
-              <div key={index} className="relative">
+              <div key={index} className="relative w-32 h-32">
+                <img src={url} className="w-full h-full object-cover rounded-lg border border-gray-300" />
                 <button
                   onClick={() => removeImage(index)}
-                  className="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                  className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center shadow-lg"
                 >
-                  X
+                  <Trash2 size={14} />
                 </button>
-                <img src={url} className="w-full rounded-lg" />
               </div>
             ))}
           </div>
         )}
-
+        <div className="flex  justify-between">
+          <button className="p-3 text-sm">
+            Cancel
+          </button>
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white p-2 rounded mt-4"
+          className="bg-yellow-400 text-sm text-white font-medium p-3 rounded-lg hover:bg-yellow-500 transition"
         >
-          Add Product
+          Publish
         </button>
+        </div>
       </form>
     </div>
   );

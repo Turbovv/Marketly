@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { UploadButton } from "~/utils/uploadthing";
-import { FileVideo } from "lucide-react";
+import { Camera  } from "lucide-react";
 import { ClipLoader } from "react-spinners";
-
 
 interface UploadThingProps {
   onUploadComplete: (files: { url: string }[]) => void;
@@ -13,10 +12,12 @@ const UploadThing: React.FC<UploadThingProps> = ({ onUploadComplete, onUploadErr
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
 
   return (
-    <div className="relative inline-flex flex-col items-center">
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <FileVideo size={20} className="text-gray-700" />
-      </div>
+    <div className="space-y-4">
+
+      <div className="relative border-2 border-dashed border-yellow-400 rounded-3xl p-6 text-center flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50">
+        <Camera  size={32} className="text-gray-500 mb-2" />
+        <p className=" font-bold">Upload photo</p>
+        <p className="text-sm text-gray-500">Max 12 photos</p>
 
       <UploadButton
         endpoint="imageUploader"
@@ -29,13 +30,14 @@ const UploadThing: React.FC<UploadThingProps> = ({ onUploadComplete, onUploadErr
           onUploadError(error);
         }}
         onUploadProgress={(progress) => setUploadProgress(progress)}
-        className="h-10 w-full opacity-0"
+        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
       />
+      </div>
 
       {uploadProgress !== null && (
-        <div className="mt-2 text-sm text-gray-700">
-           <ClipLoader color="#5de4c7" /><br />
-           Uploading...{uploadProgress}%
+        <div className="mt-2 text-sm text-gray-700 flex justify-center items-center">
+          <ClipLoader color="#5de4c7" />
+          <span className="ml-2">Uploading... {uploadProgress}%</span>
         </div>
       )}
     </div>
