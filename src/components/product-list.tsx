@@ -13,7 +13,7 @@ import "swiper/css/navigation";
 export default function ProductList() {
   const { data: products = [] } = api.products.getProducts.useQuery();
 
-  const chunkSize = 6;
+  const chunkSize = 12;
   const chunkedProducts = [];
   for (let i = 0; i < products.length; i += chunkSize) {
     chunkedProducts.push(products.slice(i, i + chunkSize));
@@ -41,7 +41,8 @@ export default function ProductList() {
           <Swiper
             slidesPerView={2}
             spaceBetween={10}
-            breakpoints={{ 640: { slidesPerView: 3 }, 1024: { slidesPerView: 5 } }}
+            slidesPerGroup={6}
+            breakpoints={{ 640: { slidesPerView: 3 }, 1024: { slidesPerView: 6 } }}
             navigation={{ nextEl: `#next-${index}`, prevEl: `#prev-${index}` }}
             modules={[Navigation]}
             className="px-4"

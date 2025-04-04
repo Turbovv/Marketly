@@ -121,7 +121,7 @@ export const productsRouter = createTRPCRouter({
             ne(products.id, input.productId),
           ),
         )
-        .limit(4);
+        .limit(12);
     }),
   getProductId: publicProcedure
     .input(z.object({ id: z.number() }))
