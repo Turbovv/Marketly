@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ClipLoader } from "react-spinners";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation } from "swiper/modules";
+import { Navigation, FreeMode } from "swiper/modules";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { api } from "~/trpc/react";
 import ProductImageCarousel from "./image-carousel";
@@ -44,7 +44,8 @@ export default function SimilarProducts({ category, productId }: SimilarProducts
           1024: { slidesPerView: 6, slidesPerGroup: 6 },
         }}
         navigation={{ nextEl: "#next-similar", prevEl: "#prev-similar" }}
-        modules={[Navigation]}
+        freeMode={true}
+        modules={[Navigation, FreeMode]}
         className="px-4"
       >
         {similarProducts.map((product: any) => {

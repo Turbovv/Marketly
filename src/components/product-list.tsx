@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation } from "swiper/modules";
+import { Navigation, FreeMode } from "swiper/modules";
 import { api } from "~/trpc/react";
 import CategoriesContainer from "./categories";
 import ProductImageCarousel from "./image-carousel";
@@ -44,7 +44,8 @@ export default function ProductList() {
             slidesPerGroup={6}
             breakpoints={{ 640: { slidesPerView: 3 }, 1024: { slidesPerView: 6 } }}
             navigation={{ nextEl: `#next-${index}`, prevEl: `#prev-${index}` }}
-            modules={[Navigation]}
+            freeMode={true}
+            modules={[Navigation,FreeMode ]}
             className="px-4"
           >
             {chunk.map((product) => {
