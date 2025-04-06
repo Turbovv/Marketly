@@ -17,12 +17,17 @@ export default function Chat({
 }) {
   const { authUser, isAuthenticated } = useAuth();
   const userName = authUser?.name ?? "Unknown User";
-  
+
   const [message, setMessage] = useState("");
   const [allMessages, setAllMessages] = useState<
-    { id: number | string; content: string; senderId: string; senderName: string | null; createdAt: string }[]
+    {
+      id: number | string;
+      content: string;
+      senderId: string;
+      senderName: string | null;
+      createdAt: string;
+    }[]
   >([]);
-  
   const messageContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const [socket, setSocket] = useState<any>(null);
@@ -42,8 +47,10 @@ export default function Chat({
     newSocket.emit("joinRoom", conversationId);
 
     newSocket.on("newMessage", (newMessage) => {
-      console.log("New message received:", newMessage);
-      setAllMessages((prev) => [...prev, newMessage]);
+      setAllMessages((prev) => {
+        const exists = prev.some((msg) => msg.id === newMessage.id);
+        return exists ? prev : [...prev, newMessage];
+      });
     });
 
     newSocket.on("conversationDeleted", (data) => {
@@ -61,7 +68,7 @@ export default function Chat({
 
   useEffect(() => {
     if (chatMessages) {
-      setAllMessages(chatMessages.map(msg => ({ ...msg, createdAt: msg.createdAt.toString() })));
+      setAllMessages(chatMessages.map((msg) => ({ ...msg, createdAt: msg.createdAt.toString() })));
     }
   }, [chatMessages]);
 
@@ -72,54 +79,56 @@ export default function Chat({
   }, [allMessages]);
 
   const handleSendMessage = () => {
-  if (!message.trim()) return;
+    if (!message.trim()) return;
 
-  const sentMessage = {
-    id: `temp-${Date.now()}`,
-    senderId: currentUserId,
-    senderName: userName,
-    content: message,
-    createdAt: new Date().toISOString(),
+    sendMessageMutation.mutate({ conversationId, content: message });
+
+    if (socket) {
+      socket.emit("sendMessage", {
+        conversationId,
+        content: message,
+        senderId: currentUserId,
+        senderName: userName,
+        createdAt: new Date().toISOString(),
+        id: `temp-${crypto.randomUUID()}`,
+      });
+    }
+
+    setMessage("");
   };
-
-  sendMessageMutation.mutate({ conversationId, content: message });
-
-  if (socket) {
-    socket.emit("sendMessage", {
-      conversationId,
-      content: message,
-      senderId: currentUserId,
-      senderName: userName,
-      createdAt: sentMessage.createdAt,
-    });
-  }
-
-  setMessage("");
-};
+  const SellerName = allMessages.find((msg) => msg.senderId !== currentUserId)?.senderName ?? "Chat";
 
   return (
-    <div className="p-4 border rounded-lg space-y-2 bg-gray-100">
-      <DeleteConversationButton conversationId={conversationId} />
-      <div className="h-60 overflow-y-auto space-y-2 p-2" ref={messageContainerRef}>
-        {allMessages.map((msg, index) => (
-          <div key={msg.id ?? `msg-${index}`} className={`flex ${msg.senderId === currentUserId ? "justify-end" : "justify-start"}`}>
-            <div className={`max-w-xs p-3 rounded-lg ${msg.senderId === currentUserId ? "bg-blue-500 text-white" : "bg-gray-200 text-black"}`}>
-              <p className="text-sm font-semibold">{msg.senderName}</p>
-              <p className="text-sm">{msg.content}</p>
-              <p className="text-xs">{formatDate(new Date(msg.createdAt))}</p>
+    <div className="flex flex-col h-full">
+      <div className="flex justify-between items-center px-6 py-3 border-b">
+        <h2 className="text-lg font-semibold">
+          {SellerName}
+        </h2>
+        <DeleteConversationButton conversationId={conversationId} />
+      </div>
+
+      <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 bg-white" ref={messageContainerRef}>
+        {allMessages.map((msg, idx) => (
+          <div key={`${msg.id}-${idx}`} className={`flex ${msg.senderId === currentUserId ? "justify-end" : "justify-start"}`}>
+            <div className={`max-w-[75%] rounded-2xl px-4 py-3 text-sm shadow-sm ${msg.senderId === currentUserId ? "bg-[#f1f5f9] text-black rounded-br-none" : "bg-white border text-gray-900 rounded-bl-none"
+              }`}
+            >
+              <p className="mb-1 font-medium">{msg.senderName}</p>
+              <p>{msg.content}</p>
+              <p className="text-xs text-gray-400 mt-1 text-right">{formatDate(new Date(msg.createdAt))}</p>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="flex gap-2 mt-4">
+      <div className="border-t bg-white px-6 py-4 flex items-center gap-3">
         <input
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          className="flex-1 border p-2 rounded-md"
+          className="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
           placeholder="Type your message..."
         />
-        <button onClick={handleSendMessage} className="bg-blue-500 text-white px-4 py-2 rounded-md">
+        <button onClick={handleSendMessage} className="bg-yellow-400 text-white px-5 py-2 rounded-lg hover:bg-yellow-500 transition">
           Send
         </button>
       </div>

@@ -2,6 +2,14 @@ import { api } from "~/trpc/react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import io from "socket.io-client";
+import { MoreVertical, Trash2 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "./ui/dropdown-menu";
+import { Button } from "./ui/button";
 
 interface DeleteConversationButtonProps {
   conversationId: number;
@@ -41,8 +49,22 @@ export default function DeleteConversationButton({ conversationId }: DeleteConve
   };
 
   return (
-    <button onClick={handleDelete} className="text-red-500 text-sm" disabled={isDeleting}>
-      {isDeleting ? "Deleting..." : "Delete"}
-    </button>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon">
+          <MoreVertical className="h-5 w-5 text-muted-foreground" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem
+          className="text-red-600 focus:bg-red-50"
+          onClick={handleDelete}
+          disabled={isDeleting}
+        >
+          <Trash2 className="h-4 w-4 mr-2" />
+          {isDeleting ? "Deleting..." : "Delete Conversation"}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
