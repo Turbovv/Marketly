@@ -53,17 +53,12 @@ export function Dropdown() {
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                     <DropdownMenuItem asChild>
-                        <Link href="/settings/favorites" className="flex items-center gap-3">
-                            <Heart className="w-5 h-5" /> My Favorites
-                        </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
                         <Link href="/cart" className="flex items-center gap-3">
                             <ShoppingCart className="w-5 h-5" /> My Cart
                         </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                        <Link href="/messages" className="flex items-center gap-3">
+                        <Link href="/chat" className="flex items-center gap-3">
                             <MessageSquare className="w-5 h-5" /> Messages
                         </Link>
                     </DropdownMenuItem>

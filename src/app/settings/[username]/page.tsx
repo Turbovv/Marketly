@@ -6,8 +6,9 @@
   import { useState } from "react";
   import SortDropdown from "~/components/sort-dropdown";
   import { sortProducts } from "~/utils/sortProducts";
-  import { ChevronRight, User, ShoppingCart, Heart, MessageSquare } from "lucide-react";
+  import { ChevronRight } from "lucide-react";
   import LogOutButton from "~/components/log-out";
+import Sidebar from "~/components/sidebar";
 
   export default function UserSettingsPage() {
     const params = useParams();
@@ -31,48 +32,15 @@
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-[260px_1fr] gap-8 p-6">
-          
-          <aside className="bg-white shadow-md rounded-lg p-6">
-            <div className="flex items-center gap-3 border p-2 rounded-lg">
-    <img
-      src={userProfile?.image ?? "/user-male.svg"}
-      alt="Profile"
-      className="w-12 h-12 rounded-full border border-gray-300"
-    />
-    <div className="flex flex-col">
-      <h1 className="text-base font-semibold text-gray-900 truncate max-w-[150px]">
-        {userProfile?.name}
-      </h1> 
-      <p className="text-sm text-blue-600 truncate max-w-[150px] overflow-hidden whitespace-nowrap">
-        {userProfile?.email}
-      </p>
-    </div>
-  </div>
-  <ul className="mt-4 space-y-2 text-gray-700">
-    <li className="flex items-center gap-3 p-2 rounded-md">
-      <User className="w-5 h-5" /> Profile
-    </li>
-  </ul>
-  <hr className="my-4" />
-  <ul className="space-y-2 text-gray-700">
-    <li className="flex items-center gap-3 p-2 rounded-md">
-      <Heart className="w-5 h-5" /> My favourites
-    </li>
-    <li className="flex items-center gap-3 p-2 hover:bg-gray-200 rounded-md cursor-pointer">
-      <ShoppingCart className="w-5 h-5" /> My cart
-    </li>
-    <li className="flex items-center gap-3 p-2 hover:bg-gray-200 rounded-md cursor-pointer">
-      <MessageSquare className="w-5 h-5" /> Messages
-    </li>
-  </ul>
-  <hr className="my-4" />
+         <div>
+          <Sidebar />
   <div
     className="flex items-center gap-3 p-2 w-full rounded-md cursor-pointer"
   >
     <LogOutButton />
   </div>
             
-          </aside>
+          </div>
 
           <div className="bg-white shadow-md rounded-lg p-6 space-y-6">
             <nav className="flex items-center text-sm text-gray-500 mb-6">

@@ -22,10 +22,10 @@ export default function Sidebar() {
       </div>
 
       <ul className="space-y-4 text-gray-700">
-        <li className="flex items-center gap-3 p-2 rounded-md hover:bg-gray-100 cursor-pointer">
+        <Link href={`/settings/${authUser?.name}`} className="flex items-center gap-3 p-2 rounded-md hover:bg-gray-100 cursor-pointer">
           <User className="w-5 h-5 text-gray-500" />
-          <span className="text-sm">Profile</span>
-        </li>
+          <span className="text-sm">My Products</span>
+        </Link>
 
         <Link href={"/create"} className="flex items-center gap-3 p-2 rounded-md hover:bg-gray-100 cursor-pointer">
           <CirclePlus className="w-5 h-5 text-gray-500" />

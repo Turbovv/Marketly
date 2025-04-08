@@ -163,4 +163,57 @@ export const chatRouter = createTRPCRouter({
 
     return { success: true };
   }),
+
+  searchConversations: protectedProcedure
+  .input(z.object({ searchTerm: z.string() }))
+  .query(async ({ ctx, input }) => {
+    const userId = ctx.session?.user?.id || ctx.jwtUser?.userId;
+    const term = input.searchTerm.toLowerCase();
+
+    if (!userId) {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
+
+    const allConversations = await db
+      .select({
+        id: conversations.id,
+        sellerId: conversations.sellerId,
+        buyerId: conversations.buyerId,
+        createdAt: conversations.createdAt,
+      })
+      .from(conversations)
+      .where(
+        or(
+          eq(conversations.sellerId, userId),
+          eq(conversations.buyerId, userId)
+        )
+      );
+
+    const sellerIds = allConversations.map((c) => c.sellerId);
+    const buyerIds = allConversations.map((c) => c.buyerId);
+
+    const sellers = await db
+      .select({ id: users.id, name: users.name })
+      .from(users)
+      .where(or(...sellerIds.map((id) => eq(users.id, id))));
+
+    const buyers = await db
+      .select({ id: users.id, name: users.name })
+      .from(users)
+      .where(or(...buyerIds.map((id) => eq(users.id, id))));
+
+    return allConversations
+      .map((conv) => ({
+        ...conv,
+        sellerName: sellers.find((s) => s.id === conv.sellerId)?.name || "",
+        buyerName: buyers.find((b) => b.id === conv.buyerId)?.name || "",
+      }))
+      .filter((conv) =>
+        conv.sellerId === userId
+          ? conv.buyerName.toLowerCase().includes(term)
+          : conv.sellerName.toLowerCase().includes(term)
+      );
+  }),
+
+
 });
