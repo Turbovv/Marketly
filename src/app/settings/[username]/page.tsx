@@ -13,6 +13,7 @@ import Sidebar from "~/components/sidebar";
   export default function UserSettingsPage() {
     const params = useParams();
     const [sortOption, setSortOption] = useState("");
+    const [showMobileSidebar, setShowMobileSidebar] = useState(false);
 
     const { data: userProfile, isLoading: userLoading } = api.profile.getUserProfile.useQuery(
     { username: params.username as string },
@@ -31,9 +32,9 @@ import Sidebar from "~/components/sidebar";
 
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-[260px_1fr] gap-8 p-6">
-         <div>
-          <Sidebar />
+        <div className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-8 p-6">
+         <div className="hidden lg:block">
+          <Sidebar setShowMobileSidebar={setShowMobileSidebar} />
   <div
     className="flex items-center gap-3 p-2 w-full rounded-md cursor-pointer"
   >
@@ -42,7 +43,7 @@ import Sidebar from "~/components/sidebar";
             
           </div>
 
-          <div className="bg-white shadow-md rounded-lg p-6 space-y-6">
+          <div className="bg-white shadow-md rounded-lg p-6 space-y-6 lg:col-span-1">
             <nav className="flex items-center text-sm text-gray-500 mb-6">
               <Link href="/" className="hover:text-blue-600">Home</Link>
               <ChevronRight className="w-4 h-4 mx-1" />
