@@ -5,8 +5,9 @@ import { api } from "~/trpc/react";
 import io from "socket.io-client";
 import { formatDate } from "~/lib/format";
 import { useRouter } from "next/navigation";
-import DeleteConversationButton from "./delete-chat";
+import DeleteConversationButton from "../delete-chat";
 import { useAuth } from "~/hooks/useAuth";
+import { ArrowLeft } from "lucide-react";
 
 export default function Chat({
   conversationId,
@@ -101,6 +102,12 @@ export default function Chat({
   return (
     <div className="flex flex-col h-full">
       <div className="flex justify-between items-center px-6 py-3 border-b">
+        <button
+            onClick={() => router.push("/chat")}
+            className="lg:hidden text-sm flex items-center gap-1 text-gray-600 hover:text-black"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
         <h2 className="text-lg font-semibold">
           {SellerName}
         </h2>

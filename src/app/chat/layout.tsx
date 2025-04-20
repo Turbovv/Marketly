@@ -13,7 +13,7 @@ export default function ChatLayout({
         <Sidebar setShowMobileSidebar={setShowMobileSidebar} />
         </div>
 
-        <div className="bg-white shadow-md rounded-lg p-6 flex-1">{children}</div>
+        <div className="bg-white shadow-md rounded-lg flex-1">{children}</div>
       </div>
     </div>
   );

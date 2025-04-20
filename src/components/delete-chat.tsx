@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
 } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
+import { revalidatePath } from "next/cache";
 
 interface DeleteConversationButtonProps {
   conversationId: number;
@@ -43,7 +44,7 @@ export default function DeleteConversationButton({ conversationId }: DeleteConve
       } finally {
         setIsDeleting(false);
         router.push("/chat")
-        router.refresh()
+        revalidatePath("/chat")
       }
     }
   };
