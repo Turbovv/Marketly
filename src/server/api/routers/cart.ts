@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { cart, products } from "~/server/db/schema";
 import { TRPCError } from "@trpc/server";
 
@@ -26,15 +26,7 @@ export const cartRouter = createTRPCRouter({
         quantity: z.number().min(1),
       })
     )
-    
     .mutation(async ({ ctx, input }) => {
-      const product = await ctx.db.query.products.findFirst({
-        where: eq(products.id, input.productId),
-      });
-
-      if (!product) {
-        throw new Error("Product not found");
-      }
       const userId = ctx.session?.user?.id || ctx.jwtUser?.userId;
 
       if (!userId) {
@@ -42,16 +34,32 @@ export const cartRouter = createTRPCRouter({
       }
 
       const existingItem = await ctx.db.query.cart.findFirst({
-        where: eq(cart.productId, input.productId),
+        where: (cart) => {
+        return and(
+          eq(cart.productId, input.productId),
+          eq(cart.userId, userId)
+        );
+      },
+    });
+
+    if (existingItem) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "This product is already in your cart",
       });
+    }
 
+    const product = await ctx.db.query.products.findFirst({
+      where: eq(products.id, input.productId),
+    });
 
-      if (existingItem) {
-        await ctx.db
-          .update(cart)
-          .set({ quantity: (existingItem.quantity ?? 0) + input.quantity })
-          .where(eq(cart.id, existingItem.id));
-      } else {
+    if (!product) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Product not found",
+      });
+    }
+
         await ctx.db.insert(cart).values({
           id: crypto.randomUUID(),
           userId: userId,
@@ -61,7 +69,6 @@ export const cartRouter = createTRPCRouter({
           desc: product.desc,
           url: product.url,
         });
-      }
 
       return { success: true };
     }),
@@ -78,10 +85,31 @@ export const cartRouter = createTRPCRouter({
       if (!userId) {
         throw new TRPCError({ code: "UNAUTHORIZED" });
       }
-      const count = await ctx.db.query.cart.findMany({
+      const cartItems = await ctx.db.query.cart.findMany({
         where: eq(cart.userId, userId),
       });
     
-      return count.length;
+      return cartItems.reduce((total, item) => total + (item.quantity || 0), 0);
     }),
+    isProductInCart: protectedProcedure
+  .input(z.object({ productId: z.number() }))
+  .query(async ({ ctx, input }) => {
+    const userId = ctx.session?.user?.id || ctx.jwtUser?.userId;
+
+    if (!userId) {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
+
+    const cartItem = await ctx.db.query.cart.findFirst({
+      where: (cart) => {
+        return and(
+          eq(cart.productId, input.productId),
+          eq(cart.userId, userId)
+        );
+      },
+    });
+
+    return !!cartItem;
+  }),
+    
 });

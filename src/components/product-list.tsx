@@ -27,7 +27,7 @@ export default function ProductList() {
         <div key={index} className="space-y-4">
           <div className="flex justify-between items-center px-4">
             <h2 className="text-lg font-semibold">Products {index + 1}</h2>
-            <div className="flex items-center gap-3">
+            <div className="items-center gap-3 hidden lg:flex">
               <Link href="/all-products" className="text-sm text-gray-600 hover:underline">See All</Link>
               <button id={`prev-${index}`} className="p-2 bg-gray-200 rounded-full hover:bg-gray-300">
                 <ChevronLeft className="w-5 h-5" />

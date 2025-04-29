@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { User, ShoppingCart, CirclePlus, MessageSquare } from "lucide-react";
+import { User, ShoppingCart, CirclePlus, MessageSquare, Mail } from "lucide-react";
 import Link from "next/link";
 import LogOutButton from "~/components/log-out";
 import { useAuth } from "~/hooks/useAuth";
@@ -62,7 +62,7 @@ export default function Sidebar({ setShowMobileSidebar }: { setShowMobileSidebar
               className={`flex items-center gap-3 p-3 rounded-md ${pathname === "/chat" ? "text-yellow-400 font-bold" : ""}`}
               onClick={() => setShowMobileSidebar(false)}
             >
-              <MessageSquare className={`w-5 h-5 ${pathname === "/chat" ? "text-yellow-400 font-bold" : "text-gray-500"}`} />
+              <Mail className={`w-5 h-5 ${pathname === "/chat" ? "text-yellow-400 font-bold" : "text-gray-500"}`} />
               <span className="text-sm">Messages</span>
             </Link>
           </li>

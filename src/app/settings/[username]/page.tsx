@@ -8,12 +8,14 @@
   import { sortProducts } from "~/utils/sortProducts";
   import { ChevronRight } from "lucide-react";
   import LogOutButton from "~/components/log-out";
+  import { useAuth } from "~/hooks/useAuth";
 import Sidebar from "~/components/sidebar";
 
   export default function UserSettingsPage() {
     const params = useParams();
     const [sortOption, setSortOption] = useState("");
     const [showMobileSidebar, setShowMobileSidebar] = useState(false);
+    const { authUser } = useAuth();
 
     const { data: userProfile, isLoading: userLoading } = api.profile.getUserProfile.useQuery(
     { username: params.username as string },
@@ -52,7 +54,7 @@ import Sidebar from "~/components/sidebar";
 
             <div className="border-t pt-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold">{userProfile?.name}'s Products</h2>
+              {authUser?.id === userProfile.id ? "Settings" : `${userProfile.name}'s Profile`}
                 <SortDropdown sortOption={sortOption} setSortOption={setSortOption} />
               </div>
 

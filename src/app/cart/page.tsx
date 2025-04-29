@@ -3,9 +3,13 @@
 import { api } from "~/trpc/react";
 
 export default function CartPage() {
+  const utils = api.useContext();
   const { data: cartItems, isLoading, error, refetch } = api.cart.getCart.useQuery();
   const removeCart = api.cart.removeFromCart.useMutation({
-    onSuccess: () => refetch(),
+    onSuccess: () => {
+      refetch();
+      void utils.cart.getCartCount.invalidate();
+    },
   });
 
   if (isLoading) return <div className="text-center text-gray-500">Loading...</div>;

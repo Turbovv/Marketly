@@ -20,6 +20,7 @@ export default function DeleteConversationButton({ conversationId }: DeleteConve
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
   const [socket, setSocket] = useState<any>(null);
+  const utils = api.useContext();
 
   useEffect(() => {
     const newSocket = io("http://localhost:3001");
@@ -30,7 +31,10 @@ export default function DeleteConversationButton({ conversationId }: DeleteConve
   }, []);
 
   const deleteConversationMutation = api.chat.deleteConversation.useMutation({
-    onSuccess: () => router.push("/chat"),
+    onSuccess: () => {
+      void utils.chat.getConversations.invalidate();
+      router.push("/chat");
+    },
   });
 
   const handleDelete = async () => {
@@ -44,7 +48,6 @@ export default function DeleteConversationButton({ conversationId }: DeleteConve
       } finally {
         setIsDeleting(false);
         router.push("/chat")
-        revalidatePath("/chat")
       }
     }
   };
