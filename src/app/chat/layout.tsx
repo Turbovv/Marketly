@@ -8,7 +8,7 @@ export default function ChatLayout({
     const [showMobileSidebar, setShowMobileSidebar] = useState(false);
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <div className="w-full max-w-6xl mx-auto flex p-6">
+      <div className="w-full max-w-7xl mx-auto flex py-16">
         <div className="hidden lg:block">
         <Sidebar setShowMobileSidebar={setShowMobileSidebar} />
         </div>

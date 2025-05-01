@@ -68,7 +68,7 @@ export default function Sidebar({ setShowMobileSidebar }: { setShowMobileSidebar
           </li>
         </ul>
 
-        <div className="mt-6 border-t pt-4">
+        <div className="py-2 border-t px-3">
           <LogOutButton />
         </div>
       </aside>
@@ -127,11 +127,11 @@ export default function Sidebar({ setShowMobileSidebar }: { setShowMobileSidebar
           <span className="text-sm">Messages</span>
         </Link>
           </li>
-      </ul>
-
-      <div className="mt-auto border-t pt-4">
+      <div className="py-2 border-t px-3">
         <LogOutButton />
       </div>
+      </ul>
+
     </aside>
     </>
   );

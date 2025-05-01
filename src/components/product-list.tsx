@@ -7,11 +7,14 @@ import { Navigation, FreeMode } from "swiper/modules";
 import { api } from "~/trpc/react";
 import CategoriesContainer from "./categories";
 import ProductImageCarousel from "./image-carousel";
+import CartToggleButton from "./cart-toggle";
+import { useAuth } from "~/hooks/useAuth";
 import "swiper/css";
 import "swiper/css/navigation";
 
 export default function ProductList() {
   const { data: products = [] } = api.products.getProducts.useQuery();
+  const { isAuthenticated, userId } = useAuth();
 
   const chunkSize = 12;
   const chunkedProducts = [];
@@ -45,19 +48,27 @@ export default function ProductList() {
             breakpoints={{ 640: { slidesPerView: 3 }, 1024: { slidesPerView: 6 } }}
             navigation={{ nextEl: `#next-${index}`, prevEl: `#prev-${index}` }}
             freeMode={true}
-            modules={[Navigation,FreeMode ]}
+            modules={[Navigation, FreeMode]}
             className="px-4"
           >
             {chunk.map((product) => {
               const images = [product.url, ...product.imageUrls?.split(",") || []];
-
+              const isOwner = userId === product.createdById
               return (
                 <SwiperSlide key={product.id}>
-                  <Link href={`/products/${product.id}`} className="group block bg-white border rounded-lg hover:shadow">
+                  <div className="group relative block bg-white border rounded-lg hover:shadow">
+                  <Link href={`/products/${product.id}`}>
                     <div className="relative h-44 overflow-hidden rounded-t-lg">
                       <img src={images[0]} alt={product.name} className="w-full h-full object-cover group-hover:opacity-0" />
                       <ProductImageCarousel images={images} className="absolute inset-0 opacity-0 group-hover:opacity-100 h-44" />
                     </div>
+                    </Link>
+                    {isAuthenticated && !isOwner && (
+                      <CartToggleButton
+                        productId={product.id}
+                        className="absolute bottom-2 right-2 z-10"
+                      />
+                    )}
                     <div className="p-3 mt-2">
                       <h2 className="text-sm font-medium truncate">{product.name}</h2>
                       <p className="text-sm text-gray-500 truncate">{product.desc}</p>
@@ -65,7 +76,7 @@ export default function ProductList() {
                         {product.price ? `${product.price.toLocaleString()} ₾` : "Price negotiable"}
                       </p>
                     </div>
-                  </Link>
+                  </div>
                 </SwiperSlide>
               );
             })}

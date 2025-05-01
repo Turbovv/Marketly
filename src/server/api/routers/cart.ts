@@ -5,11 +5,28 @@ import { cart, products } from "~/server/db/schema";
 import { TRPCError } from "@trpc/server";
 
 export const cartRouter = createTRPCRouter({
-  getCart: protectedProcedure.query(async ({ ctx }) => {
+  getCart: protectedProcedure
+    .input(z.object({ productId: z.number() }).optional())
+    .query(async ({ ctx, input }: any) => {
     const userId = ctx.session?.user?.id || ctx.jwtUser?.userId;
         if (!userId) {
           throw new TRPCError({ code: "UNAUTHORIZED" });
         }
+
+      if (input?.productId) {
+        return await ctx.db.query.cart.findFirst({
+          where: (cart: any) => {
+            return and(
+              eq(cart.productId, input.productId),
+              eq(cart.userId, userId)
+            );
+          },
+          with: {
+            product: true,
+          },
+        });
+      }
+
     return await ctx.db.query.cart.findMany({
       where: eq(cart.userId, userId),
       with: {

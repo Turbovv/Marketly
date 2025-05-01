@@ -33,8 +33,8 @@ import Sidebar from "~/components/sidebar";
     const sortedProducts = sortProducts(products || [], sortOption);
 
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-8 p-6">
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-8 py-16">
          <div className="hidden lg:block">
           <Sidebar setShowMobileSidebar={setShowMobileSidebar} />
   <div
