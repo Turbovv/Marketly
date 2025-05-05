@@ -25,7 +25,7 @@ export default function SimilarProducts({ category, productId }: SimilarProducts
     <div className="space-y-8">
       <div className="flex justify-between items-center px-4">
       <h2 className="text-lg font-semibold">Similar Products</h2>
-      <div className="flex items-center gap-3">
+      <div className=" items-center gap-3  hidden lg:flex">
           <button id="prev-similar" className="p-2 bg-gray-200 rounded-full hover:bg-gray-300">
             <ChevronLeft className="w-5 h-5" />
           </button>

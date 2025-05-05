@@ -66,7 +66,7 @@ export default function ProductList() {
                     {isAuthenticated && !isOwner && (
                       <CartToggleButton
                         productId={product.id}
-                        className="absolute bottom-2 right-2 z-10"
+                        className="absolute bottom-10 lg:bottom-2 right-2 z-10"
                       />
                     )}
                     <div className="p-3 mt-2">

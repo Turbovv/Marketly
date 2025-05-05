@@ -75,9 +75,9 @@ import Sidebar from "~/components/sidebar";
                           className="w-full h-full p-4 object-cover rounded-3xl group-hover:scale-105 transition-transform duration-200"
                         />
                       </div>
-                      <div className="p-3 mt-2">
+                      <div className="p-3 mt-2 break-words">
                         <h2 className="text-sm font-medium">{product.name}</h2>
-                        <p className="text-sm text-gray-500">{product.desc}</p>
+                        <p className="text-sm text-gray-500 w-full">{product.desc}</p>
                         <hr />
                         <div className="mt-4">
                           <p className="text-base font-semibold text-gray-900">${product.price.toLocaleString()}</p>

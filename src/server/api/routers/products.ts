@@ -190,5 +190,48 @@ export const productsRouter = createTRPCRouter({
           });
         }
       }),
+
+      updateProduct: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        name: z.string().optional(),
+        price: z.string().optional(),
+        desc: z.string().optional(),
+        url: z.string().optional(),
+        imageUrls: z.array(z.string()).optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const userId = ctx.session?.user?.id || ctx.jwtUser?.userId;
+
+        const product = await ctx.db.query.products.findFirst({
+          where: eq(products.id, input.id),
+        });
+
+        if (!product) {
+          throw new TRPCError({ 
+            code: "NOT_FOUND",
+            message: "Product not found" 
+          });
+        }
+
+        if (product.createdById !== userId) {
+          throw new TRPCError({ 
+            code: "FORBIDDEN",
+            message: "Not authorized to update this product" 
+          });
+        }
+
+        await ctx.db.update(products)
+          .set({
+            ...(input.name && { name: input.name }),
+            ...(input.price && { price: input.price }),
+            ...(input.desc && { desc: input.desc }),
+            ...(input.url && { url: input.url }),
+            ...(input.imageUrls && { imageUrls: input.imageUrls.join(',') }),
+          })
+          .where(eq(products.id, input.id));
+
+        return { success: true };
+      }),
 });
 

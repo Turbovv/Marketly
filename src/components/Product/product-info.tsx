@@ -4,7 +4,9 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { api } from "~/trpc/react";
 import { useAuth } from "~/hooks/useAuth";
-import { MessageCircleMore, Trash2 } from "lucide-react";
+import { MessageCircleMore, Trash2, Pencil } from "lucide-react";
+import { formatDate } from "~/lib/format";
+import ProductEditForm from "./product-edit-form";
 
 export default function ProductInfo({
   product,
@@ -15,6 +17,8 @@ export default function ProductInfo({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [message, setMessage] = useState("");
   const { userId, isAuthenticated } = useAuth();
+  const [isEditing, setIsEditing] = useState(false);
+  const utils = api.useContext();
 
   const isOwner = userId === product?.createdById;
 
@@ -23,6 +27,13 @@ export default function ProductInfo({
   const deleteProductMutation = api.products.deleteProduct.useMutation({
     onSuccess: () => {
       router.push("/");
+    },
+  });
+
+  const updateProductMutation = api.products.updateProduct.useMutation({
+    onSuccess: () => {
+      setIsEditing(false);
+      void utils.products.getProductId.invalidate({ id: product.id });
     },
   });
 
@@ -62,11 +73,61 @@ export default function ProductInfo({
     }
   };
 
+  const handleUpdateProduct = async (editedProduct: any) => {
+    try {
+      await updateProductMutation.mutateAsync({
+        id: product.id,
+        ...editedProduct,
+      });
+    } catch (error) {
+      console.error('Failed to update product:', error);
+    }
+  };
+
   return (
-    <div className="bg-white p-6 rounded-lg border border-gray-300 shadow-md space-y-6">
-      <div>
-        <h2 className="text-2xl font-semibold text-gray-900">{product?.name}</h2>
+    <div className="p-6 rounded-lg space-y-6">
+      <div className="flex justify-between items-center">
+        {isEditing ? (
+          <input
+            type="text"
+            value={product.name}
+            readOnly
+            className="text-2xl font-semibold text-gray-900 border rounded px-2 py-1 w-full"
+          />
+        ) : (
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <h2 className="text-2xl font-semibold text-gray-900 break-words overflow-hidden">
+              {product?.name}
+            </h2>
+            {isOwner && (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="p-1.5 hover:bg-gray-100 rounded-full transition flex-shrink-0"
+              >
+                <Pencil size={16} />
+              </button>
+            )}
+          </div>
+        )}
+        <p className="text-xs text-gray-400 flex-shrink-0 ml-2">{formatDate(new Date(product?.createdAt))}</p>
       </div>
+
+      {isEditing ? (
+        <ProductEditForm
+        product={product}
+        onCancel={() => setIsEditing(false)}
+        onUpdate={handleUpdateProduct}
+        />
+      ) : (
+        <>
+          <div className="flex flex-wrap justify-between items-center break-words">
+            <p className="text-lg border-b w-full mb-4">{product.price}$</p>
+            <div className="w-full">
+              <p className="text-lg text-gray-700">{product?.desc}</p>
+            </div>
+          </div>
+        </>
+      )}
 
       <div className="flex items-center justify-between border-t pt-4">
         <div>
@@ -74,7 +135,7 @@ export default function ProductInfo({
           {userProducts && (
             <Link
               href={`/settings/${product?.createdBy?.name}`}
-              className="text-blue-500 hover:underline"
+              className="underline"
             >
               <p className="text-sm text-gray-500 mt-1">
                 {userProducts.length} Listing{userProducts.length > 1 ? "s" : ""}
@@ -102,13 +163,6 @@ export default function ProductInfo({
         </div>
       </div>
 
-      {/* Product Description */}
-      <div className="flex justify-between items-center">
-        <p className="text-lg text-gray-700">{product?.desc}</p>
-        <p className="text-lg">{product.price}$</p>
-      </div>
-
-      {/* Modal for Sending Message */}
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-md w-96">

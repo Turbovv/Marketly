@@ -60,7 +60,7 @@ export default function ProductDetailsPage() {
 
   return (
     <div className="min-h-screen bg-gray-100 py-8">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 bg-white p-6 rounded-lg shadow-lg">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 bg-white  rounded-lg p-4">
         <div className="lg:col-span-5">
           {product && (
             <div className="relative">
