@@ -52,6 +52,20 @@ export const products = createTable("products", {
     .notNull(),
 });
 
+export const recentSearches = createTable('recent_searches', {
+  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+  term: varchar("term", { length: 255 }).notNull(),
+  userId: varchar("user_id", { length: 255 })
+    .references(() => users.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});
+
+export const recentSearchesRelations = relations(recentSearches, ({ one }) => ({
+  user: one(users, { fields: [recentSearches.userId], references: [users.id] }),
+}));
+
 export const productsRelations = relations(products, ({ one }) => ({
   createdBy: one(users, { fields: [products.createdById], references: [users.id] }),
 }));

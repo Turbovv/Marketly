@@ -4,6 +4,7 @@ import { cartRouter } from "./routers/cart";
 import { chatRouter } from "./routers/chat";
 import { profileRouter } from "./routers/profile";
 import { authRouter } from "./routers/user";
+import { searchRouter } from "./routers/search";
 
 /**
  * This is the primary router for your server.
@@ -15,7 +16,8 @@ export const appRouter = createTRPCRouter({
   cart: cartRouter,
   chat: chatRouter,
   profile: profileRouter,
-  user: authRouter
+  user: authRouter,
+  search: searchRouter,
 });
 
 // export type definition of API
