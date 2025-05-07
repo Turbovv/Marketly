@@ -6,7 +6,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, FreeMode } from "swiper/modules";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { api } from "~/trpc/react";
-import ProductImageCarousel from "./image-carousel";
+import ProductImageCarousel from "../Product/image-carousel";
 import "swiper/css";
 import "swiper/css/navigation";
 

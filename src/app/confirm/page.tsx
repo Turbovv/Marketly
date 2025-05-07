@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { api } from "~/trpc/react";
-const CONFIRMATION_CODE_LENGTH = 6;
 
 export default function ConfirmPage() {
   const [code, setCode] = useState("");
@@ -10,6 +9,7 @@ export default function ConfirmPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
+  const CONFIRMATION_CODE_LENGTH = 6;
 
   const { mutate: confirmEmail } = api.user.confirmEmail.useMutation({
     onSuccess: (data) => {

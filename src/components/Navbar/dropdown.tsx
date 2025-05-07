@@ -1,5 +1,5 @@
 import { useAuth } from "~/hooks/useAuth";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -7,10 +7,10 @@ import {
     DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
+} from "../ui/dropdown-menu";
 import { useState } from "react";
 import { ChevronDown, ChevronUp, User, ShoppingCart, Heart, MessageSquare, LogOut } from "lucide-react";
-import LogOutButton from "~/components/log-out";
+import LogOutButton from "~/components/Navbar/log-out";
 import Link from "next/link";
 
 export function Dropdown() {

@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import { api } from "~/trpc/react";
 import Link from "next/link";
 import { useState } from "react";
-import SortDropdown from "~/components/sort-dropdown";
+import SortDropdown from "~/components/Search/sort-dropdown";
 import { sortProducts } from "~/utils/sortProducts";
 import { ChevronRight } from "lucide-react";
 

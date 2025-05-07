@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import { User, ShoppingCart, CirclePlus, MessageSquare, Mail } from "lucide-react";
 import Link from "next/link";
-import LogOutButton from "~/components/log-out";
+import LogOutButton from "~/components/Navbar/log-out";
 import { useAuth } from "~/hooks/useAuth";
 
 export default function Sidebar({ setShowMobileSidebar }: { setShowMobileSidebar: (state: boolean) => void }) {

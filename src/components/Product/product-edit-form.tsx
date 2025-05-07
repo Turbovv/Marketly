@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { X } from "lucide-react";
-import UploadThing from "~/components/upload-thing";
+import UploadThing from "~/components/Product/upload-thing";
 
 interface Product {
   name: string;

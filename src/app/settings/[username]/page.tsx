@@ -4,18 +4,18 @@
   import { api } from "~/trpc/react";
   import Link from "next/link";
   import { useState } from "react";
-  import SortDropdown from "~/components/sort-dropdown";
+  import SortDropdown from "~/components/Search/sort-dropdown";
   import { sortProducts } from "~/utils/sortProducts";
   import { ChevronRight } from "lucide-react";
-  import LogOutButton from "~/components/log-out";
+  import CartToggleButton from "~/components/Cart/cart-toggle";
   import { useAuth } from "~/hooks/useAuth";
-import Sidebar from "~/components/sidebar";
+  import Sidebar from "~/components/sidebar";
 
   export default function UserSettingsPage() {
     const params = useParams();
     const [sortOption, setSortOption] = useState("");
     const [showMobileSidebar, setShowMobileSidebar] = useState(false);
-    const { authUser } = useAuth();
+    const { authUser, isAuthenticated } = useAuth();
 
     const { data: userProfile, isLoading: userLoading } = api.profile.getUserProfile.useQuery(
     { username: params.username as string },
@@ -40,19 +40,11 @@ import Sidebar from "~/components/sidebar";
   <div
     className="flex items-center gap-3 p-2 w-full rounded-md cursor-pointer"
   >
-    <LogOutButton />
   </div>
-            
           </div>
 
           <div className="bg-white shadow-md rounded-lg p-6 space-y-6 lg:col-span-1">
-            <nav className="flex items-center text-sm text-gray-500 mb-6">
-              <Link href="/" className="hover:text-blue-600">Home</Link>
-              <ChevronRight className="w-4 h-4 mx-1" />
-              <span className="text-gray-900">Settings</span>
-            </nav>
-
-            <div className="border-t pt-4">
+            <div className="">
               <div className="flex items-center justify-between">
               {authUser?.id === userProfile.id ? "Settings" : `${userProfile.name}'s Profile`}
                 <SortDropdown sortOption={sortOption} setSortOption={setSortOption} />
@@ -63,10 +55,11 @@ import Sidebar from "~/components/sidebar";
                   <p>Loading products...</p>
                 ) : products && products.length > 0 ? (
                   sortedProducts.map((product: any) => (
+                  <div  className="relative">
                     <Link
                       href={`/products/${product.id}`}
                       key={product.id}
-                      className="bg-white rounded-lg hover:shadow transition-shadow duration-200 group border border-gray-100"
+                      className="bg-white rounded-lg hover:shadow transition-shadow duration-200 group border border-gray-100 block"
                     >
                       <div className="relative h-44 overflow-hidden rounded-t-lg">
                         <img
@@ -84,6 +77,13 @@ import Sidebar from "~/components/sidebar";
                         </div>
                       </div>
                     </Link>
+                    {isAuthenticated && authUser?.id !== product.createdById && (
+                      <CartToggleButton
+                        productId={product.id}
+                        className="absolute bottom-10 lg:bottom-2 right-2 z-10"
+                      />
+                    )}
+                  </div>
                   ))
                 ) : (
                   <p className="text-gray-500">No products found.</p>

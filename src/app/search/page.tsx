@@ -2,7 +2,7 @@
 
 import { Suspense, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import SortDropdown from "~/components/sort-dropdown";
+import SortDropdown from "~/components/Search/sort-dropdown";
 import { api } from "~/trpc/react";
 import { sortProducts } from "~/utils/sortProducts";
 

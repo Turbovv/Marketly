@@ -1,12 +1,12 @@
 "use client";
 import Link from "next/link";
-import SearchBar from "~/components/search-bar";
+import SearchBar from "~/components/Search/search-bar";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "~/hooks/useAuth";
 import { api } from "~/trpc/react";
 import { ShoppingCart, CirclePlus, X, User, Mail, Home } from "lucide-react";
 import { Dropdown } from "./dropdown";
-import Sidebar from "./sidebar";
+import Sidebar from "../sidebar";
 import { useState } from "react";
 
 export default function Navbar() {

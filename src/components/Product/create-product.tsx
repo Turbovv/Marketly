@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { api } from "~/trpc/react";
 import { useRouter } from "next/navigation";
-import UploadThing from "../upload-thing";
+import UploadThing from "./upload-thing";
 import { useAuth } from "~/hooks/useAuth";
 import {
   Laptop,

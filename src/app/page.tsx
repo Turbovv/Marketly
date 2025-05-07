@@ -1,5 +1,5 @@
-import ProductList from "~/components/product-list";
-import SearchBar from "~/components/search-bar";
+import ProductList from "~/components/Product/product-list";
+import SearchBar from "~/components/Search/search-bar";
 import { HydrateClient } from "~/trpc/server";
 
 export default function Home() {

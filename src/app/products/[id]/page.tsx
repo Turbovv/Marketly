@@ -1,12 +1,11 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { Heart } from "lucide-react";
 
-import SimilarProducts from "~/components/similar-products";
-import ProductImageCarousel from "~/components/image-carousel";
+import SimilarProducts from "~/components/SimilarProducts/similar-products";
+import ProductImageCarousel from "~/components/Product/image-carousel";
 import ProductInfo from "~/components/Product/product-info";
-import CartToggleButton from "~/components/cart-toggle";
+import CartToggleButton from "~/components/Cart/cart-toggle";
 
 import { api } from "~/trpc/react";
 import { useAuth } from "~/hooks/useAuth";

@@ -5,9 +5,9 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, FreeMode } from "swiper/modules";
 import { api } from "~/trpc/react";
-import CategoriesContainer from "./categories";
+import CategoriesContainer from "../categories";
 import ProductImageCarousel from "./image-carousel";
-import CartToggleButton from "./cart-toggle";
+import CartToggleButton from "../Cart/cart-toggle";
 import { useAuth } from "~/hooks/useAuth";
 import "swiper/css";
 import "swiper/css/navigation";
@@ -31,7 +31,6 @@ export default function ProductList() {
           <div className="flex justify-between items-center px-4">
             <h2 className="text-lg font-semibold">Products {index + 1}</h2>
             <div className="items-center gap-3 hidden lg:flex">
-              <Link href="/all-products" className="text-sm text-gray-600 hover:underline">See All</Link>
               <button id={`prev-${index}`} className="p-2 bg-gray-200 rounded-full hover:bg-gray-300">
                 <ChevronLeft className="w-5 h-5" />
               </button>

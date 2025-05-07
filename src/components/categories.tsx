@@ -61,7 +61,7 @@ export default function CategoriesContainer() {
   );
 
   return (
-    <div className="bg-white rounded-lg shadow p-4 overflow-x-auto">
+    <div className="overflow-x-auto">
       <div className="grid grid-cols-6 gap-3 w-[1024px] lg:w-full">
         {allItems.map(({ name, Icon, category }) => (
             <button
