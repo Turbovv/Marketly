@@ -7,6 +7,7 @@ import { useAuth } from "~/hooks/useAuth";
 import { MessageCircleMore, Trash2, Pencil } from "lucide-react";
 import { formatDate } from "~/lib/format";
 import ProductEditForm from "./product-edit-form";
+import SendMessageModal from "./SendMessageModal/sendmessage-modal";
 
 export default function ProductInfo({
   product,
@@ -171,33 +172,13 @@ export default function ProductInfo({
         </div>
       </div>
 
-      {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-md w-96">
-            <h2 className="text-xl font-semibold mb-4">Send Message</h2>
-            <textarea
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder="Type your message here..."
-              className="w-full h-32 p-2 border border-gray-300 rounded-md mb-4 resize-none"
-            />
-            <div className="flex justify-end gap-4">
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="px-4 py-2 bg-gray-300 rounded-md"
-              >
-                Close
-              </button>
-              <button
-                onClick={handleSendMessage}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md"
-              >
-                Send Message
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+       <SendMessageModal 
+       isOpen={isModalOpen}
+       onClose={() => setIsModalOpen(false)}
+       onSend={handleSendMessage}
+       message={message}
+       setMessage={setMessage}
+     />
     </div>
   );
 }
