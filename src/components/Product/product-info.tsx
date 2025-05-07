@@ -22,8 +22,16 @@ export default function ProductInfo({
 
   const isOwner = userId === product?.createdById;
 
-  const sendMessage = api.chat.sendMessage.useMutation();
-  const createConversationMutation = api.chat.createConversation.useMutation();
+  const sendMessage = api.chat.sendMessage.useMutation({
+    onSuccess: () => {
+      void utils.chat.getConversations.invalidate();
+    }
+  });;
+  const createConversationMutation = api.chat.createConversation.useMutation({
+    onSuccess: () => {
+      void utils.chat.getConversations.invalidate();
+    }
+  });
   const deleteProductMutation = api.products.deleteProduct.useMutation({
     onSuccess: () => {
       router.push("/");

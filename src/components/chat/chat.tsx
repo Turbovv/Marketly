@@ -37,6 +37,17 @@ export default function Chat({
     { conversationId },
     { enabled: isAuthenticated }
   );
+  const { data: conversation } = api.chat.getConversation.useQuery(
+    { conversationId },
+    { enabled: isAuthenticated }
+  );
+
+  const SellerName = conversation
+    ? currentUserId === conversation.sellerId
+      ? conversation.buyerName
+      : conversation.sellerName
+    : "Chat";
+
 
   const sendMessageMutation = api.chat.sendMessage.useMutation({
     onSuccess: () => refetch(),
@@ -97,7 +108,6 @@ export default function Chat({
 
     setMessage("");
   };
-  const SellerName = allMessages.find((msg) => msg.senderId !== currentUserId)?.senderName ?? "Chat";
 
   return (
     <div className="flex flex-col h-full">

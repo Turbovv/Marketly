@@ -48,7 +48,53 @@ export const chatRouter = createTRPCRouter({
       buyerName: buyers.find((b) => b.id === conv.buyerId)?.name || "Unknown",
     }));
   }),
+  getConversation: protectedProcedure
+  .input(z.object({ conversationId: z.number() }))
+  .query(async ({ ctx, input }) => {
+    const userId = ctx.session?.user?.id || ctx.jwtUser?.userId;
 
+    if (!userId) {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
+
+    const conversation = await db
+      .select({
+        id: conversations.id,
+        sellerId: conversations.sellerId,
+        buyerId: conversations.buyerId,
+        createdAt: conversations.createdAt,
+      })
+      .from(conversations)
+      .where(eq(conversations.id, input.conversationId))
+      .limit(1);
+
+    if (!conversation.length) {
+      throw new TRPCError({ code: "NOT_FOUND" });
+    }
+
+    if (!conversation[0]) {
+      throw new TRPCError({ code: "NOT_FOUND" });
+    }
+
+    const [seller, buyer] = await Promise.all([
+      db
+        .select({ name: users.name })
+        .from(users)
+        .where(eq(users.id, conversation[0].sellerId))
+        .limit(1),
+      db
+        .select({ name: users.name })
+        .from(users)
+        .where(eq(users.id, conversation[0].buyerId))
+        .limit(1),
+    ]);
+
+    return {
+      ...conversation[0],
+      sellerName: seller[0]?.name || "Unknown",
+      buyerName: buyer[0]?.name || "Unknown",
+    };
+  }),
   createConversation: protectedProcedure
     .input(z.object({ sellerId: z.string() }))
     .mutation(async ({ ctx, input }) => {
