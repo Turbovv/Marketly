@@ -54,7 +54,7 @@
                 {productsLoading ? (
                   <p>Loading products...</p>
                 ) : products && products.length > 0 ? (
-                  sortedProducts.map((product: any) => (
+                  sortedProducts.map((product) => (
                   <div  className="relative">
                     <Link
                       href={`/products/${product.id}`}

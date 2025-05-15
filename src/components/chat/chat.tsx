@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { api } from "~/trpc/react";
 import io from "socket.io-client";
 import { formatDate } from "~/lib/format";
@@ -8,6 +8,15 @@ import { useRouter } from "next/navigation";
 import DeleteConversationButton from "./delete-chat";
 import { useAuth } from "~/hooks/useAuth";
 import { ArrowLeft } from "lucide-react";
+
+type Message = {
+  id: number | string;
+  content: string;
+  senderId: string;
+  senderName: string | null;
+  createdAt: string;
+  conversationId?: number;
+};
 
 export default function Chat({
   conversationId,
@@ -18,29 +27,28 @@ export default function Chat({
 }) {
   const { authUser, isAuthenticated } = useAuth();
   const userName = authUser?.name ?? "Unknown User";
+  const router = useRouter();
+  const messageContainerRef = useRef<HTMLDivElement>(null);
+  const socketRef = useRef<any>(null);
 
   const [message, setMessage] = useState("");
-  const [allMessages, setAllMessages] = useState<
-    {
-      id: number | string;
-      content: string;
-      senderId: string;
-      senderName: string | null;
-      createdAt: string;
-    }[]
-  >([]);
-  const messageContainerRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
-  const [socket, setSocket] = useState<any>(null);
+  const [allMessages, setAllMessages] = useState<Message[]>([]);
+  const [isConnected, setIsConnected] = useState(false);
 
-  const { data: chatMessages, refetch } = api.chat.getMessages.useQuery(
+  const { data: chatMessages } = api.chat.getMessages.useQuery(
     { conversationId },
     { enabled: isAuthenticated }
   );
+
   const { data: conversation } = api.chat.getConversation.useQuery(
     { conversationId },
     { enabled: isAuthenticated }
   );
+
+  const sendMessageMutation = api.chat.sendMessage.useMutation({
+    onSuccess: () => {
+    },
+  });
 
   const SellerName = conversation
     ? currentUserId === conversation.sellerId
@@ -48,20 +56,25 @@ export default function Chat({
       : conversation.sellerName
     : "Chat";
 
+  const connectSocket = useCallback(() => {
+    const newSocket = io("http://localhost:3001", {
+      transports: ['websocket'],
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+      forceNew: true,
+    });
 
-  const sendMessageMutation = api.chat.sendMessage.useMutation({
-    onSuccess: () => refetch(),
-  });
+    newSocket.on('connect', () => {
+      setIsConnected(true);
+      newSocket.emit("joinRoom", conversationId);
+    });
 
-  useEffect(() => {
-    const newSocket = io("http://localhost:3001");
-    setSocket(newSocket);
-    newSocket.emit("joinRoom", conversationId);
+    newSocket.on('disconnect', () => setIsConnected(false));
 
-    newSocket.on("newMessage", (newMessage) => {
-      setAllMessages((prev) => {
-        const exists = prev.some((msg) => msg.id === newMessage.id);
-        return exists ? prev : [...prev, newMessage];
+    newSocket.on("newMessage", (newMessage: Message) => {
+      setAllMessages(prev => {
+        if (prev.some(msg => msg.id === newMessage.id)) return prev;
+        return [...prev, newMessage];
       });
     });
 
@@ -69,44 +82,85 @@ export default function Chat({
       if (data.conversationId === conversationId) {
         alert("This conversation has been deleted.");
         router.push("/chat");
-        router.refresh()
+        router.refresh();
       }
     });
 
-    return () => {
-      newSocket.disconnect();
-    };
+    socketRef.current = newSocket;
+
+    return () => newSocket.disconnect();
   }, [conversationId, router]);
 
   useEffect(() => {
+    const cleanup = connectSocket();
+    return () => {
+      cleanup();
+      socketRef.current?.disconnect();
+    };
+  }, [connectSocket]);
+
+  useEffect(() => {
     if (chatMessages) {
-      setAllMessages(chatMessages.map((msg) => ({ ...msg, createdAt: msg.createdAt.toString() })));
+      setAllMessages(chatMessages.map(msg => ({ 
+        ...msg, 
+        createdAt: msg.createdAt.toString() 
+      })));
     }
   }, [chatMessages]);
 
   useEffect(() => {
-    if (messageContainerRef.current) {
-      messageContainerRef.current.scrollTop = messageContainerRef.current.scrollHeight;
-    }
+    const scrollToBottom = () => {
+      const element = messageContainerRef.current;
+      if (!element) return;
+      
+      element.scrollTop = element.scrollHeight;
+    };
+
+    scrollToBottom();
+
+    const timeoutId = setTimeout(scrollToBottom, 100);
+    
+    return () => clearTimeout(timeoutId);
   }, [allMessages]);
 
-  const handleSendMessage = () => {
-    if (!message.trim()) return;
+  const handleSendMessage = async () => {
+    if (!message.trim() || !isConnected) return;
 
-    sendMessageMutation.mutate({ conversationId, content: message });
-
-    if (socket) {
-      socket.emit("sendMessage", {
-        conversationId,
-        content: message,
+    const messageData: Message = {
+      id: `temp-${Date.now()}`,
+      content: message.trim(),
         senderId: currentUserId,
         senderName: userName,
         createdAt: new Date().toISOString(),
-        id: `temp-${crypto.randomUUID()}`,
-      });
-    }
+      conversationId,
+    };
 
+    setAllMessages(prev => [...prev, messageData]);
     setMessage("");
+    
+    messageContainerRef.current?.scrollTo({
+      top: messageContainerRef.current.scrollHeight,
+      behavior: 'smooth'
+    });
+
+    socketRef.current?.emit("sendMessage", messageData);
+    
+    try {
+      await sendMessageMutation.mutateAsync({ 
+        conversationId, 
+        content: messageData.content 
+      });
+    } catch (error) {
+      console.error("Failed to send message:", error);
+      setAllMessages(prev => prev.filter(msg => msg.id !== messageData.id));
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      void handleSendMessage();
+    }
   };
 
   return (
@@ -142,10 +196,18 @@ export default function Chat({
         <input
           value={message}
           onChange={(e) => setMessage(e.target.value)}
+          onKeyPress={handleKeyPress}
           className="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
           placeholder="Type your message..."
         />
-        <button onClick={handleSendMessage} className="bg-yellow-400 text-white px-5 py-2 rounded-lg hover:bg-yellow-500 transition">
+        <button 
+          onClick={() => void handleSendMessage()} 
+          disabled={!isConnected}
+          className={`px-5 py-2 rounded-lg transition
+            ${isConnected 
+              ? 'bg-yellow-400 text-white hover:bg-yellow-500' 
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+        >
           Send
         </button>
       </div>

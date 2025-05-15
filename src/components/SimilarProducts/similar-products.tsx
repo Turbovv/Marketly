@@ -48,7 +48,7 @@ export default function SimilarProducts({ category, productId }: SimilarProducts
         modules={[Navigation, FreeMode]}
         className="px-4"
       >
-        {similarProducts.map((product: any) => {
+        {similarProducts.map((product) => {
           const images = [product.url, ...(product.imageUrls?.split(",") || [])];
 
           return (

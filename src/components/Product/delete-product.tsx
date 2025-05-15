@@ -18,7 +18,7 @@ export default function DeleteProductButton({ productId }: { productId: number }
     },
   });
 
-  async function handleDelete(event: React.FormEvent) {
+  const handleDelete = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
       await deleteProductMutation.mutateAsync({ id: productId });

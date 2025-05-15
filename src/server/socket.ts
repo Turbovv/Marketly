@@ -3,7 +3,14 @@ import { Server as HttpServer } from "http";
 
 export const initializeSocket = (server: HttpServer) => {
   const io = new Server(server, {
-    cors: { origin: "http://localhost:3000", methods: ["GET", "POST"] },
+    cors: { 
+      origin: "*",
+      methods: ["GET", "POST"],
+    },
+    transports: ['websocket'],
+    pingTimeout: 30000,
+    pingInterval: 10000,
+    maxHttpBufferSize: 1e6,
   });
 
   io.on("connection", (socket) => {
