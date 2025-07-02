@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import UploadThing from "~/components/Product/upload-thing";
-
+import Product from "./product-info";
 interface Product {
   name: string;
-  price: string;
+  price: number;
   desc: string;
   url: string;
   imageUrls: string[];
@@ -18,7 +18,7 @@ interface ProductEditFormProps {
 
 export default function ProductEditForm({ product, onCancel, onUpdate }: ProductEditFormProps) {
   const [name, setName] = useState(product.name);
-  const [price, setPrice] = useState(product.price);
+  const [price, setPrice] = useState(product.price.toString());
   const [desc, setDesc] = useState(product.desc);
   const [mainImage, setMainImage] = useState(product.url);
   const [additionalImages, setAdditionalImages] = useState(product.imageUrls);
@@ -56,13 +56,14 @@ export default function ProductEditForm({ product, onCancel, onUpdate }: Product
     setAdditionalImages(updatedImages);
   };
 
-  const handleSubmit = () => {
-    const updatedProduct = {
+ const handleSubmit = () => {
+    const updatedProduct: Product = {
+      ...product,
       name,
-      price,
+      price: Number(price),
       desc,
       url: mainImage,
-      imageUrls: additionalImages
+      imageUrls: additionalImages,
     };
     onUpdate(updatedProduct);
   };

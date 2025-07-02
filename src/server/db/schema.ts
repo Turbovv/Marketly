@@ -46,7 +46,7 @@ export const products = createTable("products", {
     subcategory: varchar("subcategory", { length: 255 }), 
     createdById: varchar("created_by_id", { length: 255 })
     .notNull()
-    .references(() => users.id),
+    .references(() => users.id, { onDelete: "cascade" }),
     createdAt: timestamp("created_at", { withTimezone: true })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
@@ -90,7 +90,7 @@ export const accounts = createTable(
   {
     userId: varchar("user_id", { length: 255 })
       .notNull()
-      .references(() => users.id),
+      .references(() => users.id, { onDelete: "cascade" }),
     type: varchar("type", { length: 255 })
       .$type<AdapterAccount["type"]>()
       .notNull(),
@@ -129,7 +129,7 @@ export const sessions = createTable(
       .primaryKey(),
     userId: varchar("user_id", { length: 255 })
       .notNull()
-      .references(() => users.id),
+      .references(() => users.id, { onDelete: "cascade" }),
     expires: timestamp("expires", {
       mode: "date",
       withTimezone: true,
@@ -146,15 +146,21 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
 
 export const conversations = createTable("conversations", {
   id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
-  buyerId: varchar("buyer_id", { length: 255 }).notNull().references(() => users.id),
-  sellerId: varchar("seller_id", { length: 255 }).notNull().references(() => users.id),
+  buyerId: varchar("buyer_id", { length: 255 })
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  sellerId: varchar("seller_id", { length: 255 })
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at", { withTimezone: true }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 
 export const messages = createTable("messages", {
   id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
-  conversationId: integer("conversation_id").notNull().references(() => conversations.id),
-  senderId: varchar("sender_id", { length: 255 }).notNull().references(() => users.id),
+  conversationId: integer("conversation_id").notNull().references(() => conversations.id, { onDelete: "cascade" }),
+  senderId: varchar("sender_id", { length: 255 })
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
   content: varchar("content", { length: 1000 }).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 });

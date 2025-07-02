@@ -57,19 +57,31 @@ export default function Chat({
     : "Chat";
 
   const connectSocket = useCallback(() => {
-    const newSocket = io("http://localhost:3001", {
+    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
+    
+    const newSocket = io(socketUrl, {
       transports: ['websocket'],
+      reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
-      forceNew: true,
+      timeout: 20000,
     });
 
     newSocket.on('connect', () => {
+      console.log('Socket connected');
       setIsConnected(true);
       newSocket.emit("joinRoom", conversationId);
     });
 
-    newSocket.on('disconnect', () => setIsConnected(false));
+    newSocket.on('connect_error', (error) => {
+      console.error('Connection error:', error);
+      setIsConnected(false);
+    });
+
+    newSocket.on('disconnect', () => {
+      console.log('Socket disconnected');
+      setIsConnected(false);
+    });
 
     newSocket.on("newMessage", (newMessage: Message) => {
       setAllMessages(prev => {
@@ -163,6 +175,8 @@ export default function Chat({
     }
   };
 
+const sortedMessages = [...allMessages].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex justify-between items-center px-6 py-3 border-b">
@@ -179,7 +193,7 @@ export default function Chat({
       </div>
 
       <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 bg-white" ref={messageContainerRef}>
-        {allMessages.map((msg, idx) => (
+       {sortedMessages.map((msg, idx) => (
           <div key={`${msg.id}-${idx}`} className={`flex ${msg.senderId === currentUserId ? "justify-end" : "justify-start"}`}>
             <div className={`max-w-[75%] rounded-2xl px-4 py-3 text-sm shadow-sm ${msg.senderId === currentUserId ? "bg-[#f1f5f9] text-black rounded-br-none" : "bg-white border text-gray-900 rounded-bl-none"
               }`}

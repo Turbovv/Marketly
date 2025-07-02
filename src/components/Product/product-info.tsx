@@ -9,12 +9,33 @@ import { formatDate } from "~/lib/format";
 import ProductEditForm from "./product-edit-form";
 import SendMessageModal from "./SendMessageModal/sendmessage-modal";
 
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  desc: string;
+  createdAt: string | Date;
+  createdById: string;
+  createdBy?: {
+    name: string;
+  };
+  url: string;
+  imageUrls: string[];
+}
+
+interface ProductInfoProps {
+  product: Product;
+  userProducts?: string;
+  router: any;
+  existingConversation?: any;
+}
+
 export default function ProductInfo({
   product,
   userProducts,
   router,
   existingConversation,
-}: any) {
+}: ProductInfoProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [message, setMessage] = useState("");
   const { userId, isAuthenticated } = useAuth();

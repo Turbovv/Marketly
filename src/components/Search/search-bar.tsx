@@ -8,7 +8,7 @@ import { api } from "~/trpc/react";
 export default function SearchBar() {
   const [query, setQuery] = useState("");
   const [isFocused, setIsFocused] = useState(false);
-  const { data: recentSearches = [] } = api.search.getRecentSearches.useQuery(undefined, {
+  const { data: recentSearches } = api.search.getRecentSearches.useQuery(undefined, {
     enabled: isFocused
   });
 
@@ -115,7 +115,7 @@ export default function SearchBar() {
         )}
       </div>
 
-      {isFocused && recentSearches.length > 0 && (
+      {isFocused && recentSearches && recentSearches.length > 0 && (
         <div className="absolute w-full mt-1 bg-white border rounded-lg shadow-lg z-50">
           <div className="p-2">
             <p className="text-xs text-gray-500 mb-2">Recent Searches</p>

@@ -5,7 +5,7 @@ import { desc, eq, and } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 export const searchRouter = createTRPCRouter({
-    deleteRecentSearch: protectedProcedure
+    deleteRecentSearch: publicProcedure
     .input(z.object({ term: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session?.user?.id;
@@ -35,7 +35,7 @@ export const searchRouter = createTRPCRouter({
       }
     }),
 
-  addRecentSearch: protectedProcedure
+  addRecentSearch: publicProcedure
     .input(z.object({ term: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session?.user?.id;
@@ -50,7 +50,7 @@ export const searchRouter = createTRPCRouter({
       return { success: true };
     }),
 
-  getRecentSearches: protectedProcedure
+  getRecentSearches: publicProcedure
     .query(async ({ ctx }) => {
       const userId = ctx.session?.user?.id;
       if (!userId) throw new Error("User not authenticated");

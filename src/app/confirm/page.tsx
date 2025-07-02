@@ -14,7 +14,7 @@ export default function ConfirmPage() {
   const { mutate: confirmEmail } = api.user.confirmEmail.useMutation({
     onSuccess: (data) => {
     localStorage.setItem("token", data.token);
-      router.push("/dashboard");
+      router.push("/");
     },
     onError: (error) => {
       setError(error.message);

@@ -1,54 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import {
-  Laptop,
-  Monitor,
-  Gamepad,
-  Guitar,
-  Piano,
-  Drum,
-  Paintbrush,
-  Smile,
-  Scissors,
-  Puzzle,
-  Shirt,
-  Package
-} from "lucide-react";
-
-const categories = [
-  {
-    category: "Technic",
-    items: [
-      { name: "Laptops", icon: Laptop },
-      { name: "Computers", icon: Monitor },
-      { name: "Game Consoles", icon: Gamepad }
-    ]
-  },
-  {
-    category: "Music",
-    items: [
-      { name: "Guitars", icon: Guitar },
-      { name: "Pianos", icon: Piano },
-      { name: "Drums", icon: Drum }
-    ]
-  },
-  {
-    category: "Beauty and Fashion",
-    items: [
-      { name: "Makeup", icon: Paintbrush },
-      { name: "Skincare", icon: Smile },
-      { name: "Hair Products", icon: Scissors }
-    ]
-  },
-  {
-    category: "Children's Products",
-    items: [
-      { name: "Toys", icon: Puzzle },
-      { name: "Clothing", icon: Shirt },
-      { name: "Accessories", icon: Package }
-    ]
-  }
-];
+import { CATEGORIES } from "~/config/categories";
 
 export default function CategoriesContainer() {
   const router = useRouter();
@@ -56,7 +8,7 @@ export default function CategoriesContainer() {
   const handleClick = (category: string, name: string) => {
     router.push(`/category/${category}/${name.replace(/\s+/g, "-")}`);
   };
-  const allItems = categories.flatMap(({ category, items }) =>
+  const allItems = CATEGORIES.flatMap(({ category, items }) =>
     items.map(({ name, icon: Icon }) => ({ name, Icon, category }))
   );
 

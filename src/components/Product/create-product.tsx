@@ -1,24 +1,24 @@
 "use client";
-import { useState } from "react";
+
+import React, { useState } from "react";
 import { api } from "~/trpc/react";
 import { useRouter } from "next/navigation";
-import UploadThing from "./upload-thing";
 import { useAuth } from "~/hooks/useAuth";
+import { Trash2 } from "lucide-react";
+import { CATEGORIES } from "~/config/categories";
+import UploadThing from "./upload-thing";
+
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Textarea } from "~/components/ui/textarea";
 import {
-  Laptop,
-  Monitor,
-  Gamepad,
-  Guitar,
-  Piano,
-  Drum,
-  Paintbrush,
-  Smile,
-  Scissors,
-  Puzzle,
-  Shirt,
-  Package,
-  Trash2,
-} from "lucide-react";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
+import { Label } from "~/components/ui/label";
 
 export default function CreateProductPage() {
   const [name, setName] = useState("");
@@ -27,59 +27,24 @@ export default function CreateProductPage() {
   const [category, setCategory] = useState("");
   const [subcategory, setSubCategory] = useState("");
   const [imageUrls, setImageUrls] = useState<string[]>([]);
-  const { isAuthenticated, userId } = useAuth();
-  const { mutateAsync } = api.products.createProduct.useMutation();
   const router = useRouter();
-
-  const categories = [
-    {
-      category: "Technic",
-      items: [
-        { name: "Laptops", icon: Laptop },
-        { name: "Computers", icon: Monitor },
-        { name: "Game Consoles", icon: Gamepad },
-      ],
-    },
-    {
-      category: "Music",
-      items: [
-        { name: "Guitars", icon: Guitar },
-        { name: "Pianos", icon: Piano },
-        { name: "Drums", icon: Drum },
-      ],
-    },
-    {
-      category: "Beauty and Fashion",
-      items: [
-        { name: "Makeup", icon: Paintbrush },
-        { name: "Skincare", icon: Smile },
-        { name: "Hair Products", icon: Scissors },
-      ],
-    },
-    {
-      category: "Children's Products",
-      items: [
-        { name: "Toys", icon: Puzzle },
-        { name: "Clothing", icon: Shirt },
-        { name: "Accessories", icon: Package },
-      ],
-    },
-  ];
+  const { isAuthenticated, userId } = useAuth();
+  const createProduct = api.products.createProduct.useMutation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isAuthenticated || !imageUrls.length)
-      return;
+    if (!isAuthenticated || !userId || !imageUrls.length){
+      return
+    }
     try {
-      if (!userId) return;
+      const mainImage = imageUrls[0];
+      if (!mainImage) return;
 
-      const mainImage: any = imageUrls[0];
-      const additionalImages = imageUrls.length > 1 ? imageUrls.slice(1) : null;
-      await mutateAsync({
+      await createProduct.mutateAsync({
         name,
-        imageUrls: additionalImages,
+        imageUrls: imageUrls.slice(1),
         desc,
-        price: price ? parseFloat(price) : 0,
+        price: Number(price) || 0,
         category,
         subcategory,
         url: mainImage,
@@ -93,126 +58,125 @@ export default function CreateProductPage() {
   };
 
   const removeImage = (index: number) => {
-    setImageUrls((prev) => prev.filter((_, i) => i !== index));
+    setImageUrls((prev) => prev.filter((url, i) => i !== index));
   };
-
+ const handleImageUpload = (files: Array<{ url: string }>) => {
+    const newUrls = files.map((file) => file.url);
+    setImageUrls((current) => [...current, ...newUrls]);
+  }
   return (
-    <div className="max-w-2xl  p-8 bg-white shadow-lg rounded-lg border border-gray-200">
-      <h2 className="text-3xl font-semibold mb-8 text-gray-800">Add an advertisement</h2>
+    <div className="max-w-2xl p-8 bg-white rounded-lg shadow-md">
+      <h2 className="text-3xl font-semibold mb-8">Add an advertisement</h2>
       <p className="font-bold mb-4">Product details</p>
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label className="text-sm text-gray-700 mb-1">Title</label>
-          <input
-            type="text"
+        <div className="space-y-2">
+          <Label htmlFor="name">Title</Label>
+          <Input
+            id="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
             required
           />
         </div>
 
-        <div>
-          <label className="block text-sm text-gray-700  mb-1">Description</label>
-          <textarea
+        <div className="space-y-2">
+          <Label htmlFor="desc">Description</Label>
+          <Textarea
+            id="desc"
             value={desc}
             onChange={(e) => setDesc(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 outline-none"
             rows={4}
             required
           />
         </div>
 
-        <div>
-          <label className="block text-sm text-gray-700 font-medium mb-1">Price</label>
-          <input
-            type="text"
+        <div className="space-y-2">
+          <Label htmlFor="price">Price</Label>
+          <Input
+            id="price"
+            type="number"
             value={price}
-            onChange={(e) => {
-              const newValue = e.target.value.replace(/\D/g, "");
-              setPrice(newValue);
-            }}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none 
-             appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            onChange={(e) => setPrice(e.target.value.replace(/\D/g, ""))}
             placeholder="0"
             required
           />
         </div>
-        <div>
-          <label className="block text-sm text-gray-700 font-medium mb-1">Choose/type Category *</label>
-          <select
-            value={category}
-            onChange={(e) => {
-              setCategory(e.target.value);
-              setSubCategory("");
-            }}
-            className="w-full p-3 text-sm border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 outline-none"
-            required
-          >
-            <option value="" disabled>Select a category</option>
-            {categories.map((cat) => (
-            <option key={cat.category} value={cat.category}>
+        <div className="space-y-2">
+          <Label>Category</Label>
+          <Select value={category} onValueChange={setCategory}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select a category" />
+            </SelectTrigger>
+            <SelectContent>
+            {CATEGORIES.map((cat) => (
+            <SelectItem key={cat.category} value={cat.category}>
                 {cat.category}
-              </option>
+              </SelectItem>
             ))}
-          </select>
+            </SelectContent>
+          </Select>
         </div>
 
         {category && (
-          <div>
-            <label className="block text-sm text-gray-700 font-medium mb-1">Subcategory</label>
-            <select
-              value={subcategory}
-              onChange={(e) => setSubCategory(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 outline-none"
-              required
-            >
-              <option value="" disabled>Select a subcategory</option>
-              {categories
-                .find((cat) => cat.category === category)
-                ?.items.map((item) => (
-                <option key={item.name} value={item.name}>
+          <div className="space-y-2">
+            <Label>Subcategory</Label>
+            <Select value={subcategory} onValueChange={setSubCategory}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select a subcategory" />
+              </SelectTrigger>
+              <SelectContent>
+                {CATEGORIES.find((cat) => cat.category === category)?.items.map(
+                  (item) => (
+                <SelectItem key={item.name} value={item.name}>
                   {item.name}
-                </option>
-              ))}
-            </select>
+                </SelectItem>
+              )
+                )}
+              </SelectContent>
+            </Select>
           </div>
         )}
 
-        <div>
-          <label className="block text-sm text-gray-700 font-medium mb-2">Upload Product Images</label>
+        <div className="space-y-2">
+          <Label>Product Images</Label>
           <UploadThing
-            onUploadComplete={(files) => {
-              setImageUrls((prev) => [...prev, ...files.map((file) => file.url)]);
-            }}
+            onUploadComplete={handleImageUpload}
             onUploadError={(error) => alert(error.message)}
           />
-        </div>
+
         {imageUrls.length > 0 && (
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap gap-4 mt-4">
             {imageUrls.map((url, index) => (
-              <div key={index} className="relative w-32 h-32">
-                <img src={url} className="w-full h-full object-cover rounded-lg border border-gray-300" />
-                <button
+              <div key={url} className="relative w-32 h-32">
+                <img
+                    src={url}
+                    alt={`Product image ${index + 1}`}
+                    className="w-full h-full object-cover rounded-lg border"
+                  />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    className="absolute -top-2 -right-2 h-6 w-6"
                   onClick={() => removeImage(index)}
-                  className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center shadow-lg"
-                >
-                  <Trash2 size={14} />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-        <div className="flex  justify-between">
-          <button className="p-3 text-sm">
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="flex justify-between pt-4">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => router.back()}
+          >
             Cancel
-          </button>
-        <button
-          type="submit"
-          className="bg-yellow-400 text-sm text-white font-medium p-3 rounded-lg hover:bg-yellow-500 transition"
-        >
-          Publish
-        </button>
+          </Button>
+        <Button type="submit">Publish</Button>
         </div>
       </form>
     </div>
