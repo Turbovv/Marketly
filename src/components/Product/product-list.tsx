@@ -13,8 +13,12 @@ import "swiper/css";
 import "swiper/css/navigation";
 
 export default function ProductList() {
-  const { data: products = [] } = api.products.getProducts.useQuery();
+  const { data: products } = api.products.getProducts.useQuery();
   const { isAuthenticated, userId } = useAuth();
+
+ if (!products || products.length === 0) {
+    return <div>No products found.</div>;
+  }
 
   const chunkSize = 12;
   const chunkedProducts = [];
@@ -29,7 +33,7 @@ export default function ProductList() {
       {chunkedProducts.map((chunk, index) => (
         <div key={index} className="space-y-4">
           <div className="flex justify-between items-center px-4">
-            <h2 className="text-lg font-semibold">Products {index + 1}</h2>
+            <h2 className="text-lg font-semibold">Products</h2>
             <div className="items-center gap-3 hidden lg:flex">
               <button id={`prev-${index}`} className="p-2 bg-gray-200 rounded-full hover:bg-gray-300">
                 <ChevronLeft className="w-5 h-5" />

@@ -19,11 +19,11 @@ export interface JWTUser {
   }
   
   export const useAuth = () => {
-    const { data: nextAuthSession } = useSession();
+    const { data: nextAuthSession, status: nextAuthStatus } = useSession();
     const [jwtUser, setJwtUser] = useState<JWTUser | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [token, setToken] = useState<string | null>(null);
-  
+    const [jwtChecked, setJwtChecked] = useState(false);
     useEffect(() => {
       const storedToken = localStorage.getItem('token');
       setToken(storedToken);
@@ -43,6 +43,7 @@ export interface JWTUser {
             localStorage.removeItem('token');
             setJwtUser(null);
             setIsAuthenticated(false);
+            setJwtChecked(true);
             window.location.href = '/login';
           }
         }
@@ -53,15 +54,18 @@ export interface JWTUser {
       if (userData) {
         setJwtUser(userData);
         setIsAuthenticated(true);
-        
+        setJwtChecked(true);
         if (userData.newToken) {
           localStorage.setItem('token', userData.newToken);
           setToken(userData.newToken);
         }
       } else if (nextAuthSession?.user) {
         setIsAuthenticated(true);
+        setJwtChecked(true);
+      } else if (!token && nextAuthStatus !== "loading") {
+        setJwtChecked(true);
       }
-    }, [userData, nextAuthSession]);
+    }, [userData, nextAuthSession, token, nextAuthStatus]);
   
   const authUser = nextAuthSession?.user
     ? {
@@ -80,11 +84,14 @@ export interface JWTUser {
         userType: "jwt",
       }
     : null;
-  
-    return {
+
+  const isLoading = nextAuthStatus === "loading" || !jwtChecked;
+
+  return {
       isAuthenticated,
       userId: authUser?.id,
     authUser,
     userType: authUser?.userType,
+    isLoading,
     };
   };

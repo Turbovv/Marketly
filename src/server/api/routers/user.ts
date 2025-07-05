@@ -6,6 +6,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import { TRPCError } from "@trpc/server";
+import crypto from "crypto";
 
 const JWT_SECRET = process.env.JWT_SECRET || "+8APs0PI/xDA6v42wSxTcS++8hdIC6/5r1taMlGaq/I=";
 const EMAIL_USER = process.env.EMAIL_USER;
@@ -245,4 +246,97 @@ export const authRouter = createTRPCRouter({
         message: "Logged out successfully"
       };
     }),
+    forgotPassword: publicProcedure
+    .input(z.object({ email: z.string().email() }))
+    .mutation(async ({ ctx, input }) => {
+      const user = await ctx.db.query.users.findFirst({
+        where: eq(users.email, input.email),
+      });
+
+      if (!user) {
+        return { message: "If this email exists, a reset code has been sent." };
+      }
+
+      const resetCode = crypto.randomInt(100000, 999999).toString();
+      const token = jwt.sign(
+        {
+          userId: user.id,
+          email: user.email,
+          resetCode,
+        },
+        JWT_SECRET,
+        { expiresIn: "15m" }
+      );
+
+      await transporter.sendMail({
+        from: `"UpMarket" <${EMAIL_USER}>`,
+        to: user.email,
+        subject: "Password Reset Code",
+        text: `Your password reset code is: ${resetCode}`,
+      });
+
+      return { token, message: "If this email exists, a reset code has been sent." };
+    }),
+
+  resetPassword: publicProcedure
+    .input(z.object({
+      token: z.string(),
+      resetCode: z.string(),
+      newPassword: z.string().min(6),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const decoded = jwt.verify(input.token, JWT_SECRET) as {
+          userId: string;
+          resetCode: string;
+        };
+
+        if (decoded.resetCode !== input.resetCode) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Invalid reset code",
+          });
+        }
+
+        const hashedPassword = await bcrypt.hash(input.newPassword, 10);
+
+        await ctx.db.update(users)
+          .set({ password: hashedPassword })
+          .where(eq(users.id, decoded.userId));
+
+        return { message: "Password reset successful" };
+      } catch (error) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Invalid or expired token",
+        });
+      }
+    }),
+    validateResetCode: publicProcedure
+  .input(z.object({
+    token: z.string(),
+    resetCode: z.string(),
+  }))
+  .mutation(async ({ input }) => {
+    try {
+      const decoded = jwt.verify(input.token, JWT_SECRET) as {
+        resetCode: string;
+      };
+
+      if (decoded.resetCode !== input.resetCode) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Invalid reset code",
+        });
+      }
+
+      return { message: "Code is valid" };
+    } catch (err) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Invalid or expired token",
+      });
+    }
+  }),
+
 });

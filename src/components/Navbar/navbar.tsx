@@ -8,13 +8,14 @@ import { ShoppingCart, CirclePlus, X, User, Mail, Home } from "lucide-react";
 import { Dropdown } from "./dropdown";
 import Sidebar from "../sidebar";
 import { useState } from "react";
+import { Skeleton } from "~/components/ui/skeleton";
 
 export default function Navbar() {
-    const {isAuthenticated, authUser } = useAuth();
+    const {isAuthenticated, authUser, isLoading: authLoading } = useAuth();
     const pathname = usePathname();
     const router = useRouter();
     const [showSidebar, setShowSidebar] = useState(false);
-    const { data: cartCount = 0 } = api.cart.getCartCount.useQuery(undefined, {
+    const { data: cartCount = 0, isLoading: cartLoading } = api.cart.getCartCount.useQuery(undefined, {
         enabled: isAuthenticated
     });
     const navigate = (path: string) => {
@@ -25,7 +26,7 @@ export default function Navbar() {
         setShowSidebar(false);
       }
     };
-    if (pathname.startsWith("/login") || pathname.startsWith("/register") || pathname.startsWith("/confirm")) {
+    if (pathname.startsWith("/login") || pathname.startsWith("/register") || pathname.startsWith("/confirm") || pathname.startsWith("/forgot-password")) {
         return null;
     }
 
@@ -49,7 +50,13 @@ export default function Navbar() {
                     )}
 
                     <div className="hidden lg:flex items-center gap-6">
-                        {isAuthenticated ? (
+                        {authLoading ? (
+                            <>
+                                <Skeleton className="w-24 h-10 rounded-xl" />
+                                <Skeleton className="w-10 h-10 rounded-full" />
+                                <Skeleton className="w-10 h-10 rounded-xl" />
+                            </>
+                        ) : isAuthenticated ? (
                             <>
                                 <button 
                                     onClick={() => navigate("/create")} 
@@ -70,7 +77,9 @@ export default function Navbar() {
                                 >
                                     <div className="relative">
                                         <ShoppingCart size={18} />
-                                        {cartCount > 0 && (
+                                        {cartLoading ? (
+                                            <Skeleton className="absolute -top-2 -right-2 w-4 h-4 rounded-full" />
+                                        ) : cartCount > 0 && (
                                             <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
                                                 {cartCount}
                                             </span>
@@ -116,7 +125,9 @@ export default function Navbar() {
             >
                 <div className="relative">
                     <ShoppingCart size={18} />
-                    {cartCount > 0 && (
+                    {cartLoading ? (
+                        <Skeleton className="absolute -top-2 -right-2 w-4 h-4 rounded-full" />
+                    ) : cartCount > 0 && (
                         <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-[10px] rounded-full w-3.5 h-3.5 flex items-center justify-center">
                             {cartCount}
                         </span>
@@ -125,7 +136,9 @@ export default function Navbar() {
                 <span className="text-xs">Cart</span>
             </button>
             
-            {isAuthenticated ? (
+            {authLoading ? (
+                <Skeleton className="w-6 h-6 rounded-full" />
+            ) : isAuthenticated ? (
                 <button 
                     onClick={() => setShowSidebar(true)}
                     className="flex flex-col items-center gap-1"

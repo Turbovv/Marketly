@@ -9,23 +9,9 @@ import { formatDate } from "~/lib/format";
 import ProductEditForm from "./product-edit-form";
 import SendMessageModal from "./SendMessageModal/sendmessage-modal";
 
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  desc: string;
-  createdAt: string | Date;
-  createdById: string;
-  createdBy?: {
-    name: string;
-  };
-  url: string;
-  imageUrls: string[];
-}
-
 interface ProductInfoProps {
-  product: Product;
-  userProducts?: string;
+  product: any;
+  userProducts?: any;
   router: any;
   existingConversation?: any;
 }

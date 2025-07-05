@@ -5,7 +5,7 @@ import Link from "next/link";
 import CartToggleButton from "~/components/Cart/cart-toggle";
 
 export default function Cart() {
-  const { data: cartItems, isLoading, error, }: any = api.cart.getCart.useQuery();
+  const { data: cartItems, isLoading, error, } = api.cart.getCart.useQuery();
 
 
   if (isLoading) return <div className="text-center text-gray-500">Loading...</div>;
