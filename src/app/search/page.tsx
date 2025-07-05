@@ -8,7 +8,7 @@ import { sortProducts } from "~/utils/sortProducts";
 
 export default function SearchResults() {
   const searchParams = useSearchParams();
-  const query = searchParams?.get("query") || ""; 
+  const query = searchParams?.get("query") || "";
   const { data: products, isLoading } = api.products.searchProducts.useQuery(
     { query },
     { enabled: query.trim() !== "" }

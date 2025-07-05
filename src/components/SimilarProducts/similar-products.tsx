@@ -11,10 +11,10 @@ import "swiper/css";
 import "swiper/css/navigation";
 
 type SimilarProductsProps = {
-    category: string;
-    productId: number;
-  };
-  
+  category: string;
+  productId: number;
+};
+
 export default function SimilarProducts({ category, productId }: SimilarProductsProps) {
   const { data: similarProducts, isLoading } = api.products.similarProducts.useQuery({ category, productId });
 
@@ -24,15 +24,15 @@ export default function SimilarProducts({ category, productId }: SimilarProducts
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center px-4">
-      <h2 className="text-lg font-semibold">Similar Products</h2>
-      <div className=" items-center gap-3  hidden lg:flex">
+        <h2 className="text-lg font-semibold">Similar Products</h2>
+        <div className=" items-center gap-3  hidden lg:flex">
           <button id="prev-similar" className="p-2 bg-gray-200 rounded-full hover:bg-gray-300">
             <ChevronLeft className="w-5 h-5" />
           </button>
           <button id="next-similar" className="p-2 bg-gray-200 rounded-full hover:bg-gray-300">
             <ChevronRight className="w-5 h-5" />
           </button>
-          </div>
+        </div>
       </div>
 
       <Swiper

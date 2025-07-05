@@ -23,7 +23,7 @@ export default function RootLayout({
         <SessionProvider>
           <TRPCReactProvider>
             <Suspense fallback={<div>Loading...</div>}>
-            <Navbar />
+              <Navbar />
               {children}
             </Suspense>
           </TRPCReactProvider>

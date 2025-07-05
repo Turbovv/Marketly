@@ -13,7 +13,7 @@ export default function ConfirmPage() {
 
   const { mutate: confirmEmail } = api.user.confirmEmail.useMutation({
     onSuccess: (data) => {
-    localStorage.setItem("token", data.token);
+      localStorage.setItem("token", data.token);
       router.push("/");
     },
     onError: (error) => {

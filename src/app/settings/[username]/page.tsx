@@ -1,61 +1,61 @@
-  "use client";
+"use client";
 
-  import { useParams } from "next/navigation";
-  import { api } from "~/trpc/react";
-  import Link from "next/link";
-  import { useState } from "react";
-  import SortDropdown from "~/components/Search/sort-dropdown";
-  import { sortProducts } from "~/utils/sortProducts";
-  import { ChevronRight } from "lucide-react";
-  import CartToggleButton from "~/components/Cart/cart-toggle";
-  import { useAuth } from "~/hooks/useAuth";
-  import Sidebar from "~/components/sidebar";
+import { useParams } from "next/navigation";
+import { api } from "~/trpc/react";
+import Link from "next/link";
+import { useState } from "react";
+import SortDropdown from "~/components/Search/sort-dropdown";
+import { sortProducts } from "~/utils/sortProducts";
+import { ChevronRight } from "lucide-react";
+import CartToggleButton from "~/components/Cart/cart-toggle";
+import { useAuth } from "~/hooks/useAuth";
+import Sidebar from "~/components/sidebar";
 
-  export default function UserSettingsPage() {
-    const params = useParams();
-    const [sortOption, setSortOption] = useState("");
-    const [showMobileSidebar, setShowMobileSidebar] = useState(false);
-    const { authUser, isAuthenticated } = useAuth();
+export default function UserSettingsPage() {
+  const params = useParams();
+  const [sortOption, setSortOption] = useState("");
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false);
+  const { authUser, isAuthenticated } = useAuth();
 
-    const { data: userProfile, isLoading: userLoading } = api.profile.getUserProfile.useQuery(
+  const { data: userProfile, isLoading: userLoading } = api.profile.getUserProfile.useQuery(
     { username: params.username as string },
     { enabled: !!params.username }
   );
 
-    const { data: products, isLoading: productsLoading } = api.profile.getUserProducts.useQuery(
-      { userId: userProfile?.id as string },
-      { enabled: !!userProfile?.id }
-    );
+  const { data: products, isLoading: productsLoading } = api.profile.getUserProducts.useQuery(
+    { userId: userProfile?.id as string },
+    { enabled: !!userProfile?.id }
+  );
 
   if (userLoading) return <div>Loading profile...</div>;
   if (!userProfile) return <div className="flex h-screen items-center justify-center text-red-500">User not found</div>;
 
-    const sortedProducts = sortProducts(products || [], sortOption);
+  const sortedProducts = sortProducts(products || [], sortOption);
 
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-8 py-16">
-         <div className="hidden lg:block">
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-8 py-16">
+        <div className="hidden lg:block">
           <Sidebar setShowMobileSidebar={setShowMobileSidebar} />
-  <div
-    className="flex items-center gap-3 p-2 w-full rounded-md cursor-pointer"
-  >
-  </div>
+          <div
+            className="flex items-center gap-3 p-2 w-full rounded-md cursor-pointer"
+          >
           </div>
+        </div>
 
-          <div className="bg-white shadow-md rounded-lg p-6 space-y-6 lg:col-span-1">
-            <div className="">
-              <div className="flex items-center justify-between">
+        <div className="bg-white shadow-md rounded-lg p-6 space-y-6 lg:col-span-1">
+          <div className="">
+            <div className="flex items-center justify-between">
               {authUser?.id === userProfile.id ? "Settings" : `${userProfile.name}'s Profile`}
-                <SortDropdown sortOption={sortOption} setSortOption={setSortOption} />
-              </div>
+              <SortDropdown sortOption={sortOption} setSortOption={setSortOption} />
+            </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-                {productsLoading ? (
-                  <p>Loading products...</p>
-                ) : products && products.length > 0 ? (
-                  sortedProducts.map((product) => (
-                  <div  className="relative">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+              {productsLoading ? (
+                <p>Loading products...</p>
+              ) : products && products.length > 0 ? (
+                sortedProducts.map((product) => (
+                  <div className="relative">
                     <Link
                       href={`/products/${product.id}`}
                       key={product.id}
@@ -84,15 +84,15 @@
                       />
                     )}
                   </div>
-                  ))
-                ) : (
-                  <p className="text-gray-500">No products found.</p>
-                )}
-              </div>
+                ))
+              ) : (
+                <p className="text-gray-500">No products found.</p>
+              )}
             </div>
           </div>
-
         </div>
+
       </div>
-    );
-  }
+    </div>
+  );
+}

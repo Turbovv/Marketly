@@ -3,11 +3,11 @@ import { Server as HttpServer } from "http";
 
 export const initializeSocket = (server: HttpServer) => {
   const io = new Server(server, {
-    cors: { 
+    cors: {
       origin: "*",
       methods: ["GET", "POST"],
     },
-    transports: ['websocket'],
+    transports: ["websocket"],
     pingTimeout: 30000,
     pingInterval: 10000,
     maxHttpBufferSize: 1e6,
@@ -22,12 +22,19 @@ export const initializeSocket = (server: HttpServer) => {
     });
 
     socket.on("sendMessage", (message) => {
-      io.to(`conversation-${message.conversationId}`).emit("newMessage", message);
-      console.log(`Message sent in conversation ${message.conversationId}: ${message.content}`);
+      io.to(`conversation-${message.conversationId}`).emit(
+        "newMessage",
+        message,
+      );
+      console.log(
+        `Message sent in conversation ${message.conversationId}: ${message.content}`,
+      );
     });
 
     socket.on("deleteConversation", (conversationId) => {
-      io.to(`conversation-${conversationId}`).emit("conversationDeleted", { conversationId });
+      io.to(`conversation-${conversationId}`).emit("conversationDeleted", {
+        conversationId,
+      });
       console.log(`Conversation ${conversationId} deleted`);
     });
 

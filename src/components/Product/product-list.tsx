@@ -16,7 +16,7 @@ export default function ProductList() {
   const { data: products } = api.products.getProducts.useQuery();
   const { isAuthenticated, userId } = useAuth();
 
- if (!products || products.length === 0) {
+  if (!products || products.length === 0) {
     return <div>No products found.</div>;
   }
 
@@ -60,11 +60,11 @@ export default function ProductList() {
               return (
                 <SwiperSlide key={product.id}>
                   <div className="group relative block bg-white border rounded-lg hover:shadow">
-                  <Link href={`/products/${product.id}`}>
-                    <div className="relative h-44 overflow-hidden rounded-t-lg">
-                      <img src={images[0]} alt={product.name} className="w-full h-full object-cover group-hover:opacity-0" />
-                      <ProductImageCarousel images={images} className="absolute inset-0 opacity-0 group-hover:opacity-100 h-44" />
-                    </div>
+                    <Link href={`/products/${product.id}`}>
+                      <div className="relative h-44 overflow-hidden rounded-t-lg">
+                        <img src={images[0]} alt={product.name} className="w-full h-full object-cover group-hover:opacity-0" />
+                        <ProductImageCarousel images={images} className="absolute inset-0 opacity-0 group-hover:opacity-100 h-44" />
+                      </div>
                     </Link>
                     {isAuthenticated && !isOwner && (
                       <CartToggleButton

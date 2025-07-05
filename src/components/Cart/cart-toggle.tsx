@@ -50,9 +50,9 @@ export default function CartToggleButton({
       if (isInCart && cartItem) {
         await removeFromCartMutation.mutateAsync({ cartId: cartItem.id });
       } else {
-        await addToCartMutation.mutateAsync({ 
+        await addToCartMutation.mutateAsync({
           productId,
-          quantity: 1 
+          quantity: 1
         });
       }
     } catch (error) {

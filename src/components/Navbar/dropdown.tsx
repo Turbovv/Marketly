@@ -14,7 +14,7 @@ import LogOutButton from "~/components/Navbar/log-out";
 import Link from "next/link";
 
 export function Dropdown() {
-    const { authUser} = useAuth();
+    const { authUser } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
 
     return (
@@ -32,20 +32,20 @@ export function Dropdown() {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
                 <div className="py-2 px-2 flex gap-3">
-                <img
+                    <img
                         src={authUser?.image || "/user-male.svg"}
                         alt="Profile"
                         className="rounded-full w-10 h-10"
                     />
-                   <div className="">
-                   <h1 className="text-base font-semibold text-gray-900">{authUser?.name}</h1>
-                   <p className="text-sm text-blue-600 truncate w-[160px]">{authUser?.email}</p>
-                   </div>
+                    <div className="">
+                        <h1 className="text-base font-semibold text-gray-900">{authUser?.name}</h1>
+                        <p className="text-sm text-blue-600 truncate w-[160px]">{authUser?.email}</p>
+                    </div>
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                     <DropdownMenuItem asChild>
-                        <Link href={`/settings/${authUser?.name}`}className="flex items-center gap-3">
+                        <Link href={`/settings/${authUser?.name}`} className="flex items-center gap-3">
                             <User className="w-5 h-5" /> Profile
                         </Link>
                     </DropdownMenuItem>

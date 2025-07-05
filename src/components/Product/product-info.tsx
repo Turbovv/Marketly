@@ -130,9 +130,9 @@ export default function ProductInfo({
 
       {isEditing ? (
         <ProductEditForm
-        product={product}
-        onCancel={() => setIsEditing(false)}
-        onUpdate={handleUpdateProduct}
+          product={product}
+          onCancel={() => setIsEditing(false)}
+          onUpdate={handleUpdateProduct}
         />
       ) : (
         <>
@@ -179,13 +179,13 @@ export default function ProductInfo({
         </div>
       </div>
 
-       <SendMessageModal 
-       isOpen={isModalOpen}
-       onClose={() => setIsModalOpen(false)}
-       onSend={handleSendMessage}
-       message={message}
-       setMessage={setMessage}
-     />
+      <SendMessageModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSend={handleSendMessage}
+        message={message}
+        setMessage={setMessage}
+      />
     </div>
   );
 }

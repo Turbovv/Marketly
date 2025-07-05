@@ -32,11 +32,11 @@ export default function Cart() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 
             max-w-md sm:max-w-2xl lg:max-w-none mx-auto">
             {cartItems.map((item: any) => (
-              <div 
-                key={item.id} 
+              <div
+                key={item.id}
                 className="group relative bg-white border rounded-lg hover:shadow-lg transition-shadow duration-200"
               >
-                <Link 
+                <Link
                   href={`/products/${item.productId}`}
                   className="block"
                 >

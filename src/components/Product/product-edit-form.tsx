@@ -32,7 +32,7 @@ export default function ProductEditForm({ product, onCancel, onUpdate }: Product
 
   const handleImageUpload = (files: { url: string }[]) => {
     const newUrls: any = files.map(file => file.url);
-    
+
     if (!mainImage) {
       setMainImage(newUrls[0]);
       setAdditionalImages([...additionalImages, ...newUrls.slice(1)]);
@@ -56,7 +56,7 @@ export default function ProductEditForm({ product, onCancel, onUpdate }: Product
     setAdditionalImages(updatedImages);
   };
 
- const handleSubmit = () => {
+  const handleSubmit = () => {
     const updatedProduct: Product = {
       ...product,
       name,

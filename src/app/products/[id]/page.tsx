@@ -16,10 +16,10 @@ export default function ProductDetailsPage() {
   const { userId, isAuthenticated } = useAuth();
   const productId = id ? Number(id) : null;
 
-  const { 
-    data: product, 
-    isLoading, 
-    error 
+  const {
+    data: product,
+    isLoading,
+    error
   } = api.products.getProductId.useQuery(
     { id: productId as number },
     { enabled: !!productId }
@@ -63,10 +63,10 @@ export default function ProductDetailsPage() {
         <div className="lg:col-span-5">
           {product && (
             <div className="relative">
-              <ProductImageCarousel 
-                images={images} 
-                showThumbnails={true} 
-                className="aspect-[4/3]" 
+              <ProductImageCarousel
+                images={images}
+                showThumbnails={true}
+                className="aspect-[4/3]"
               />
               {!isOwner && isAuthenticated && (
                 <CartToggleButton
@@ -89,9 +89,9 @@ export default function ProductDetailsPage() {
 
         {product?.category && (
           <div className="lg:col-span-12 mt-12">
-            <SimilarProducts 
-              category={product.category} 
-              productId={product.id} 
+            <SimilarProducts
+              category={product.category}
+              productId={product.id}
             />
           </div>
         )}

@@ -10,7 +10,7 @@ export default function CartLayout({
     <div className="min-h-screen flex items-center justify-center">
       <div className="w-full max-w-7xl mx-auto flex gap-8 py-16">
         <div className="hidden lg:block">
-        <Sidebar setShowMobileSidebar={setShowMobileSidebar} />
+          <Sidebar setShowMobileSidebar={setShowMobileSidebar} />
         </div>
         <div className="">{children}</div>
       </div>

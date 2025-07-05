@@ -33,7 +33,7 @@ export default function CreateProductPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isAuthenticated || !userId || !imageUrls.length){
+    if (!isAuthenticated || !userId || !imageUrls.length) {
       return
     }
     try {
@@ -60,7 +60,7 @@ export default function CreateProductPage() {
   const removeImage = (index: number) => {
     setImageUrls((prev) => prev.filter((url, i) => i !== index));
   };
- const handleImageUpload = (files: Array<{ url: string }>) => {
+  const handleImageUpload = (files: Array<{ url: string }>) => {
     const newUrls = files.map((file) => file.url);
     setImageUrls((current) => [...current, ...newUrls]);
   }
@@ -108,11 +108,11 @@ export default function CreateProductPage() {
               <SelectValue placeholder="Select a category" />
             </SelectTrigger>
             <SelectContent>
-            {CATEGORIES.map((cat) => (
-            <SelectItem key={cat.category} value={cat.category}>
-                {cat.category}
-              </SelectItem>
-            ))}
+              {CATEGORIES.map((cat) => (
+                <SelectItem key={cat.category} value={cat.category}>
+                  {cat.category}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -127,10 +127,10 @@ export default function CreateProductPage() {
               <SelectContent>
                 {CATEGORIES.find((cat) => cat.category === category)?.items.map(
                   (item) => (
-                <SelectItem key={item.name} value={item.name}>
-                  {item.name}
-                </SelectItem>
-              )
+                    <SelectItem key={item.name} value={item.name}>
+                      {item.name}
+                    </SelectItem>
+                  )
                 )}
               </SelectContent>
             </Select>
@@ -144,11 +144,11 @@ export default function CreateProductPage() {
             onUploadError={(error) => alert(error.message)}
           />
 
-        {imageUrls.length > 0 && (
-          <div className="flex flex-wrap gap-4 mt-4">
-            {imageUrls.map((url, index) => (
-              <div key={url} className="relative w-32 h-32">
-                <img
+          {imageUrls.length > 0 && (
+            <div className="flex flex-wrap gap-4 mt-4">
+              {imageUrls.map((url, index) => (
+                <div key={url} className="relative w-32 h-32">
+                  <img
                     src={url}
                     alt={`Product image ${index + 1}`}
                     className="w-full h-full object-cover rounded-lg border"
@@ -158,7 +158,7 @@ export default function CreateProductPage() {
                     variant="destructive"
                     size="icon"
                     className="absolute -top-2 -right-2 h-6 w-6"
-                  onClick={() => removeImage(index)}
+                    onClick={() => removeImage(index)}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -176,7 +176,7 @@ export default function CreateProductPage() {
           >
             Cancel
           </Button>
-        <Button type="submit">Publish</Button>
+          <Button type="submit">Publish</Button>
         </div>
       </form>
     </div>

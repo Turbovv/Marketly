@@ -49,7 +49,7 @@ export default function ChatList({
                 className={cn(
                   "flex items-center px-4 py-3 cursor-pointer hover:bg-gray-100",
                   selectedId === conversation.id &&
-                    "border-l-4 border-yellow-500 bg-gray-50"
+                  "border-l-4 border-yellow-500 bg-gray-50"
                 )}
                 onClick={() =>
                   router.push(`/chat?conversationId=${conversation.id}`)

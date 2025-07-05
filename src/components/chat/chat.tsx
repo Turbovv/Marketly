@@ -58,7 +58,7 @@ export default function Chat({
 
   const connectSocket = useCallback(() => {
     const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
-    
+
     const newSocket = io(socketUrl, {
       transports: ['websocket'],
       reconnection: true,
@@ -113,9 +113,9 @@ export default function Chat({
 
   useEffect(() => {
     if (chatMessages) {
-      setAllMessages(chatMessages.map(msg => ({ 
-        ...msg, 
-        createdAt: msg.createdAt.toString() 
+      setAllMessages(chatMessages.map(msg => ({
+        ...msg,
+        createdAt: msg.createdAt.toString()
       })));
     }
   }, [chatMessages]);
@@ -124,14 +124,14 @@ export default function Chat({
     const scrollToBottom = () => {
       const element = messageContainerRef.current;
       if (!element) return;
-      
+
       element.scrollTop = element.scrollHeight;
     };
 
     scrollToBottom();
 
     const timeoutId = setTimeout(scrollToBottom, 100);
-    
+
     return () => clearTimeout(timeoutId);
   }, [allMessages]);
 
@@ -141,26 +141,26 @@ export default function Chat({
     const messageData: Message = {
       id: `temp-${Date.now()}`,
       content: message.trim(),
-        senderId: currentUserId,
-        senderName: userName,
-        createdAt: new Date().toISOString(),
+      senderId: currentUserId,
+      senderName: userName,
+      createdAt: new Date().toISOString(),
       conversationId,
     };
 
     setAllMessages(prev => [...prev, messageData]);
     setMessage("");
-    
+
     messageContainerRef.current?.scrollTo({
       top: messageContainerRef.current.scrollHeight,
       behavior: 'smooth'
     });
 
     socketRef.current?.emit("sendMessage", messageData);
-    
+
     try {
-      await sendMessageMutation.mutateAsync({ 
-        conversationId, 
-        content: messageData.content 
+      await sendMessageMutation.mutateAsync({
+        conversationId,
+        content: messageData.content
       });
     } catch (error) {
       console.error("Failed to send message:", error);
@@ -175,17 +175,17 @@ export default function Chat({
     }
   };
 
-const sortedMessages = [...allMessages].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+  const sortedMessages = [...allMessages].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
   return (
     <div className="flex flex-col h-full">
       <div className="flex justify-between items-center px-6 py-3 border-b">
         <button
-            onClick={() => router.push("/chat")}
-            className="lg:hidden text-sm flex items-center gap-1 text-gray-600 hover:text-black"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
+          onClick={() => router.push("/chat")}
+          className="lg:hidden text-sm flex items-center gap-1 text-gray-600 hover:text-black"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </button>
         <h2 className="text-lg font-semibold">
           {SellerName}
         </h2>
@@ -193,7 +193,7 @@ const sortedMessages = [...allMessages].sort((a, b) => new Date(a.createdAt).get
       </div>
 
       <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 bg-white" ref={messageContainerRef}>
-       {sortedMessages.map((msg, idx) => (
+        {sortedMessages.map((msg, idx) => (
           <div key={`${msg.id}-${idx}`} className={`flex ${msg.senderId === currentUserId ? "justify-end" : "justify-start"}`}>
             <div className={`max-w-[75%] rounded-2xl px-4 py-3 text-sm shadow-sm ${msg.senderId === currentUserId ? "bg-[#f1f5f9] text-black rounded-br-none" : "bg-white border text-gray-900 rounded-bl-none"
               }`}
@@ -214,12 +214,12 @@ const sortedMessages = [...allMessages].sort((a, b) => new Date(a.createdAt).get
           className="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400"
           placeholder="Type your message..."
         />
-        <button 
-          onClick={() => void handleSendMessage()} 
+        <button
+          onClick={() => void handleSendMessage()}
           disabled={!isConnected}
           className={`px-5 py-2 rounded-lg transition
-            ${isConnected 
-              ? 'bg-yellow-400 text-white hover:bg-yellow-500' 
+            ${isConnected
+              ? 'bg-yellow-400 text-white hover:bg-yellow-500'
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
         >
           Send

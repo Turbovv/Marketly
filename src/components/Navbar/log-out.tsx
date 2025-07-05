@@ -3,8 +3,8 @@ import { LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "~/hooks/useAuth";
 export default function LogOutButton() {
-const { authUser } = useAuth();
-const router = useRouter();
+    const { authUser } = useAuth();
+    const router = useRouter();
 
     const handleLogout = () => {
         if (authUser?.userType === "jwt") {
