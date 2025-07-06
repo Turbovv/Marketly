@@ -11,26 +11,46 @@ import CartToggleButton from "../Cart/cart-toggle";
 import { useAuth } from "~/hooks/useAuth";
 import "swiper/css";
 import "swiper/css/navigation";
+import { Skeleton } from "~/components/ui/skeleton"; 
 
 export default function ProductList() {
-  const { data: products } = api.products.getProducts.useQuery();
+  const { data: products, isLoading } = api.products.getProducts.useQuery();
   const { isAuthenticated, userId } = useAuth();
-
-  if (!products || products.length === 0) {
-    return <div>No products found.</div>;
-  }
 
   const chunkSize = 12;
   const chunkedProducts = [];
-  for (let i = 0; i < products.length; i += chunkSize) {
-    chunkedProducts.push(products.slice(i, i + chunkSize));
+  if (products && products.length > 0) {
+    for (let i = 0; i < products.length; i += chunkSize) {
+      chunkedProducts.push(products.slice(i, i + chunkSize));
+    }
   }
 
   return (
     <div className="space-y-8">
       <CategoriesContainer />
 
-      {chunkedProducts.map((chunk, index) => (
+      {(isLoading || !products) ? (
+        <div className="px-4 space-y-4">
+          <div className="flex justify-between items-center">
+            <Skeleton className="h-6 w-24" />
+            <div className="gap-3 hidden lg:flex">
+              <Skeleton className="h-8 w-8 rounded-full" />
+              <Skeleton className="h-8 w-8 rounded-full" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            {Array.from({ length: 12 }).map((_, i) => (
+              <div key={i} className="border rounded-lg p-3 space-y-2">
+                <Skeleton className="h-44 w-full rounded-lg" />
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-4 w-2/4" />
+                <Skeleton className="h-5 w-1/2 mt-2" />
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : chunkedProducts.map((chunk, index) => (
         <div key={index} className="space-y-4">
           <div className="flex justify-between items-center px-4">
             <h2 className="text-lg font-semibold">Products</h2>
