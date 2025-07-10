@@ -15,6 +15,7 @@ const config = {
   ],
   "rules": {
     "@typescript-eslint/array-type": "off",
+    'import/no-case-sensitive-paths': 'error',
     "@typescript-eslint/consistent-type-definitions": "off",
     "@typescript-eslint/consistent-type-imports": [
       "warn",
