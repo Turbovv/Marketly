@@ -102,6 +102,43 @@ export default function ProductInfo({
 
   return (
     <div className="p-6 rounded-lg space-y-6">
+      <div className="text-sm text-gray-500 space-x-1 mb-1 flex flex-wrap items-center">
+        <Link href="/" className="hover:underline text-gray-500">
+          Home
+        </Link>
+        <span>/</span>
+
+        {product?.category && product?.subcategory && (
+          <>
+            <Link
+              href={`/category/${encodeURIComponent(product.category)}/${encodeURIComponent(
+                product.subcategory
+              )}`}
+              className="hover:underline text-gray-500"
+            >
+              {product.category}
+            </Link>
+            <span>/</span>
+          </>
+        )}
+
+        {product?.subcategory && (
+          <>
+            <Link
+              href={`/category/${encodeURIComponent(product.category)}/${encodeURIComponent(
+                product.subcategory
+              )}`}
+              className="hover:underline text-gray-500"
+            >
+              {product.subcategory}
+            </Link>
+            <span>/</span>
+          </>
+        )}
+
+        <span className="text-gray-700 font-medium">{product?.name}</span>
+      </div>
+
       <div className="flex justify-between items-center">
         {isEditing ? (
           <input
@@ -112,7 +149,7 @@ export default function ProductInfo({
           />
         ) : (
           <div className="flex items-center gap-2 flex-1 min-w-0">
-            <h2 className="text-2xl font-semibold text-gray-900 break-words overflow-hidden">
+            <h2 className="text-xl font-semibold text-gray-800 break-words overflow-hidden truncate">
               {product?.name}
             </h2>
             {isOwner && (
