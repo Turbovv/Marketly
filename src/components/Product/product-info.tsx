@@ -4,10 +4,11 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { api } from "~/trpc/react";
 import { useAuth } from "~/hooks/useAuth";
-import { MessageCircleMore, Trash2, Pencil } from "lucide-react";
+import { MessageCircleMore, Pencil } from "lucide-react";
 import { formatDate } from "~/lib/format";
 import ProductEditForm from "./product-edit-form";
 import SendMessageModal from "./SendMessageModal/sendmessage-modal";
+import DeleteProductButton from "./delete-product";
 
 interface ProductInfoProps {
   product: any;
@@ -39,11 +40,6 @@ export default function ProductInfo({
     onSuccess: () => {
       void utils.chat.getConversations.invalidate();
     }
-  });
-  const deleteProductMutation = api.products.deleteProduct.useMutation({
-    onSuccess: () => {
-      router.push("/");
-    },
   });
 
   const updateProductMutation = api.products.updateProduct.useMutation({
@@ -83,11 +79,6 @@ export default function ProductInfo({
     }
   };
 
-  const handleDeleteProduct = () => {
-    if (confirm("Are you sure you want to delete this product?")) {
-      deleteProductMutation.mutate({ id: product.id });
-    }
-  };
 
   const handleUpdateProduct = async (editedProduct: any) => {
     try {
@@ -206,12 +197,7 @@ export default function ProductInfo({
             </button>
           )}
           {isOwner && (
-            <button
-              onClick={handleDeleteProduct}
-              className="bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition flex items-center justify-center"
-            >
-              <Trash2 size={20} />
-            </button>
+          <DeleteProductButton productId={product.id} />
           )}
         </div>
       </div>
