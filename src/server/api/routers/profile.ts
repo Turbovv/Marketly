@@ -1,14 +1,22 @@
-import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { users, products } from "~/server/db/schema";
+import { eq } from "drizzle-orm";
 
 export const profileRouter = createTRPCRouter({
   getUserProfile: publicProcedure
     .input(z.object({ username: z.string() }))
     .query(async ({ ctx, input }) => {
+      const decodedUsername = decodeURIComponent(input.username);
+
       const user = await ctx.db.query.users.findFirst({
-        where: eq(users.name, input.username),
+        where: eq(users.name, decodedUsername),
+        }) ||
+        await ctx.db.query.users.findFirst({
+          where: eq(users.username, decodedUsername),
+        }) ||
+        await ctx.db.query.users.findFirst({
+          where: eq(users.email, decodedUsername),
       });
 
       if (!user) throw new Error("User not found");

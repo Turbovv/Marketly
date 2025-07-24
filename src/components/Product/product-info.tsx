@@ -44,6 +44,7 @@ export default function ProductInfo({
 
   const updateProductMutation = api.products.updateProduct.useMutation({
     onSuccess: () => {
+      
       setIsEditing(false);
       void utils.products.getProductId.invalidate({ id: product.id });
     },

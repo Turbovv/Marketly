@@ -33,6 +33,7 @@ export const users = createTable("user", {
   confirmed: integer("confirmed").default(0),
   confirmationCode: varchar("confirmation_code", { length: 6 }),
   userType: varchar("user_type", { length: 10 }).notNull().default('oauth'),
+  username: varchar("username").unique(),
 });
 
 export const products = createTable("products", {

@@ -97,13 +97,17 @@ export const authRouter = createTRPCRouter({
             message: "Invalid confirmation code",
           });
         }
-
+        const rawUsername = decoded.email?.split("@")[0];
+        if (!rawUsername) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Username generation failed" });
+        }
         const [newUser] = await ctx.db
           .insert(users)
           .values({
             name: decoded.name,
             email: decoded.email,
             password: decoded.password,
+            username: rawUsername,
             confirmed: 1,
             userType: "jwt",
           })
