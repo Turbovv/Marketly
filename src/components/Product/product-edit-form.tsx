@@ -4,7 +4,7 @@ import UploadThing from "~/components/Product/upload-thing";
 import Product from "./product-info";
 interface Product {
   name: string;
-  price: number;
+  price: string;
   desc: string;
   url: string;
   imageUrls: string[];
@@ -60,7 +60,7 @@ export default function ProductEditForm({ product, onCancel, onUpdate }: Product
     const updatedProduct: Product = {
       ...product,
       name,
-      price: Number(price),
+      price,
       desc,
       url: mainImage,
       imageUrls: additionalImages,

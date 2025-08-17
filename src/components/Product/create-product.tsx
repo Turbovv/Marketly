@@ -28,12 +28,12 @@ export default function CreateProductPage() {
   const [subcategory, setSubCategory] = useState("");
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const router = useRouter();
-  const { isAuthenticated, userId } = useAuth();
+  const { isAuthenticated, userId, authUser } = useAuth();
   const createProduct = api.products.createProduct.useMutation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isAuthenticated || !userId || !imageUrls.length) {
+    if (!isAuthenticated || !userId || !imageUrls.length || !authUser ) {
       return
     }
     try {
