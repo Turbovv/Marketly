@@ -75,15 +75,23 @@ export default function ProductList() {
             className="px-4"
           >
             {chunk.map((product) => {
-              const images = [product.url, ...product.imageUrls?.split(",") || []];
+              const images = [product.url, ...(product.imageUrls?.split(",") || [])].filter(Boolean);
               const isOwner = userId === product.createdById
               return (
                 <SwiperSlide key={product.id}>
                   <div className="group relative block bg-white border rounded-lg hover:shadow">
                     <Link href={`/products/${product.id}`}>
                       <div className="relative h-44 overflow-hidden rounded-t-lg">
+                        {images.length > 0 ? (
+                          <>
                         <img src={images[0]} alt={product.name} className="w-full h-full object-cover group-hover:opacity-0" />
                         <ProductImageCarousel images={images} className="absolute inset-0 opacity-0 group-hover:opacity-100 h-44" />
+                          </>
+                        ) : (
+                          <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400">
+                            No image
+                          </div>
+                        )}
                       </div>
                     </Link>
                     {isAuthenticated && !isOwner && (
