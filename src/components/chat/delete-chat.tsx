@@ -10,7 +10,6 @@ import {
   DropdownMenuItem,
 } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
-import { revalidatePath } from "next/cache";
 
 interface DeleteConversationButtonProps {
   conversationId: number;

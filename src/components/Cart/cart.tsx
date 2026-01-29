@@ -31,7 +31,7 @@ export default function Cart() {
         <div className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 
             max-w-md sm:max-w-2xl lg:max-w-none mx-auto">
-            {cartItems.map((item: any) => (
+            {cartItems.map((item) => (
               <div
                 key={item.id}
                 className="group relative bg-white border rounded-lg hover:shadow-lg transition-shadow duration-200"
@@ -64,7 +64,7 @@ export default function Cart() {
                   </div>
                 </Link>
                 <CartToggleButton
-                  productId={item.productId}
+                  productId={item.productId ?? 0}
                   isInCart={true}
                   className="absolute bottom-2 right-2 z-10"
                 />

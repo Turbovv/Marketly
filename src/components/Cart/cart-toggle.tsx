@@ -47,9 +47,11 @@ export default function CartToggleButton({
   const handleCartOperation = async () => {
     try {
       setIsLoading(true);
-      if (isInCart && cartItem) {
-        await removeFromCartMutation.mutateAsync({ cartId: cartItem.id });
-      } else {
+      const item = Array.isArray(cartItem) ? cartItem[0] : cartItem;
+
+      if (isInCart && item?.id) {
+        await removeFromCartMutation.mutateAsync({ cartId: item.id });
+      } else if (productId) {
         await addToCartMutation.mutateAsync({
           productId,
           quantity: 1
@@ -57,6 +59,7 @@ export default function CartToggleButton({
       }
     } catch (error) {
       console.error("Failed to update cart:", error);
+    } finally {
       setIsLoading(false);
     }
   };

@@ -7,36 +7,34 @@ import { TRPCError } from "@trpc/server";
 export const cartRouter = createTRPCRouter({
   getCart: protectedProcedure
     .input(z.object({ productId: z.number() }).optional())
-    .query(async ({ ctx, input }: any) => {
-      const userId = ctx.session?.user?.id || ctx.jwtUser?.userId;
-      if (!userId) {
-        throw new TRPCError({ code: "UNAUTHORIZED" });
-      }
-
-      if (input?.productId) {
-        return await ctx.db.query.cart.findFirst({
-          where: (cart: any) => {
-            return and(
-              eq(cart.productId, input.productId),
-              eq(cart.userId, userId),
-            );
-          },
-          with: {
-            product: true,
-          },
+    .query(async ({ ctx, input }) => {
+      if (!ctx.user) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You must be logged in",
         });
       }
+      const userId = ctx.user.id;
 
-      return await ctx.db.query.cart.findMany({
+      if (input?.productId) {
+        const item = await ctx.db.query.cart.findFirst({
+          where: and(
+            eq(cart.productId, input.productId),
+            eq(cart.userId, userId),
+          ),
+          with: { product: true },
+        });
+        return item ? [item] : [];
+      }
+
+      const items = await ctx.db.query.cart.findMany({
         where: eq(cart.userId, userId),
-        with: {
-          product: true,
-        },
+        with: { product: true },
       });
+      return items ?? [];
     }),
 
   addToCart: protectedProcedure
-
     .input(
       z.object({
         productId: z.number(),
@@ -44,19 +42,19 @@ export const cartRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const userId = ctx.session?.user?.id || ctx.jwtUser?.userId;
-
-      if (!userId) {
-        throw new TRPCError({ code: "UNAUTHORIZED" });
+      if (!ctx.user) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You must be logged in to create a product",
+        });
       }
+      const userId = ctx.user.id;
 
       const existingItem = await ctx.db.query.cart.findFirst({
-        where: (cart) => {
-          return and(
-            eq(cart.productId, input.productId),
-            eq(cart.userId, userId),
-          );
-        },
+        where: and(
+          eq(cart.productId, input.productId),
+          eq(cart.userId, userId),
+        ),
       });
 
       if (existingItem) {
@@ -79,7 +77,7 @@ export const cartRouter = createTRPCRouter({
 
       await ctx.db.insert(cart).values({
         id: crypto.randomUUID(),
-        userId: userId,
+        userId,
         productId: input.productId,
         quantity: input.quantity,
         price: product.price,
@@ -93,37 +91,53 @@ export const cartRouter = createTRPCRouter({
   removeFromCart: protectedProcedure
     .input(z.object({ cartId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      await ctx.db.delete(cart).where(eq(cart.id, input.cartId));
+      if (!ctx.user) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You must be logged in to create a product",
+        });
+      }
+      const userId = ctx.user.id;
+
+      await ctx.db
+        .delete(cart)
+        .where(and(eq(cart.id, input.cartId), eq(cart.userId, userId)));
+
       return { success: true };
     }),
-  getCartCount: protectedProcedure.query(async ({ ctx }) => {
-    const userId = ctx.session?.user?.id || ctx.jwtUser?.userId;
 
-    if (!userId) {
-      throw new TRPCError({ code: "UNAUTHORIZED" });
+  getCartCount: protectedProcedure.query(async ({ ctx }) => {
+    if (!ctx.user) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "You must be logged in to create a product",
+      });
     }
+    const userId = ctx.user.id;
+
     const cartItems = await ctx.db.query.cart.findMany({
       where: eq(cart.userId, userId),
     });
 
     return cartItems.reduce((total, item) => total + (item.quantity || 0), 0);
   }),
+
   isProductInCart: protectedProcedure
     .input(z.object({ productId: z.number() }))
     .query(async ({ ctx, input }) => {
-      const userId = ctx.session?.user?.id || ctx.jwtUser?.userId;
-
-      if (!userId) {
-        throw new TRPCError({ code: "UNAUTHORIZED" });
+      if (!ctx.user) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You must be logged in to create a product",
+        });
       }
+      const userId = ctx.user.id;
 
       const cartItem = await ctx.db.query.cart.findFirst({
-        where: (cart) => {
-          return and(
-            eq(cart.productId, input.productId),
-            eq(cart.userId, userId),
-          );
-        },
+        where: and(
+          eq(cart.productId, input.productId),
+          eq(cart.userId, userId),
+        ),
       });
 
       return !!cartItem;

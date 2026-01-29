@@ -48,7 +48,6 @@ export default function CreateProductPage() {
         category,
         subcategory,
         url: mainImage,
-        createdById: userId,
       });
       router.push("/");
       router.refresh()

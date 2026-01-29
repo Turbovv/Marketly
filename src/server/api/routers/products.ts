@@ -17,7 +17,7 @@ export const productsRouter = createTRPCRouter({
   getProducts: publicProcedure.query(async ({ ctx }) => {
     return await ctx.db.query.products.findMany();
   }),
-  createProduct: publicProcedure
+  createProduct: protectedProcedure
     .input(
       z.object({
         name: z.string(),
@@ -27,43 +27,9 @@ export const productsRouter = createTRPCRouter({
         imageUrls: z.array(z.string()).nullable(),
         category: z.string(),
         subcategory: z.string().optional(),
-        createdById: z.string(),
       }),
     )
     .mutation(async ({ input, ctx }) => {
-      const authHeader = ctx.headers?.get("authorization");
-      const jwtToken = authHeader?.replace("Bearer ", "");
-
-      if (jwtToken) {
-        try {
-          const decoded = jwt.verify(jwtToken, JWT_SECRET) as {
-            userId: string;
-          };
-          const user = await ctx.db.query.users.findFirst({
-            where: and(eq(users.id, decoded.userId), eq(users.userType, "jwt")),
-          });
-
-          if (user && user.id === input.createdById) {
-            return await ctx.db.insert(products).values({
-              name: input.name,
-              url: input.url,
-              desc: input.desc,
-              price: input.price.toString(),
-              imageUrls:
-                input.imageUrls && input.imageUrls.length > 0
-                  ? input.imageUrls.join(",")
-                  : null,
-              category: input.category,
-              subcategory: input.subcategory || null,
-              createdById: user.id,
-            });
-          }
-        } catch (error) {
-          console.error("JWT verification failed:", error);
-        }
-      }
-
-      if (ctx.session?.user?.id === input.createdById) {
         return await ctx.db.insert(products).values({
           name: input.name,
           url: input.url,
@@ -75,13 +41,7 @@ export const productsRouter = createTRPCRouter({
               : null,
           category: input.category,
           subcategory: input.subcategory || null,
-          createdById: ctx.session.user.id,
-        });
-      }
-
-      throw new TRPCError({
-        code: "UNAUTHORIZED",
-        message: "You must be logged in to create a product",
+          createdById: ctx.user.id,
       });
     }),
   getProductsByCategory: publicProcedure
@@ -160,7 +120,7 @@ export const productsRouter = createTRPCRouter({
   deleteProduct: protectedProcedure
     .input(z.object({ id: z.number() }))
     .mutation(async ({ ctx, input }) => {
-      const userId = ctx.session?.user?.id || ctx.jwtUser?.userId;
+      const userId = ctx.user.id;
 
       const product = await ctx.db.query.products.findFirst({
         where: eq(products.id, input.id),
@@ -209,7 +169,7 @@ export const productsRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const userId = ctx.session?.user?.id || ctx.jwtUser?.userId;
+      const userId = ctx.user.id;
 
       const product = await ctx.db.query.products.findFirst({
         where: eq(products.id, input.id),

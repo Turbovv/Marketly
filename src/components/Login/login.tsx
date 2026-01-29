@@ -3,6 +3,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "~/trpc/react";
 import Link from "next/link";
+import Cookies from "js-cookie";
+import { signIn } from "next-auth/react";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -12,8 +14,7 @@ export default function Login() {
 
   const { mutate: login } = api.user.login.useMutation({
     onSuccess: (data) => {
-      localStorage.setItem("token", data.token);
-      router.push(`/`);
+      Cookies.set("token", data.token, { expires: 7, sameSite: "lax", path: "/" });
       window.location.href = "/";
     },
     onError: (error) => {
@@ -107,7 +108,9 @@ export default function Login() {
 
           <button
             type="button"
-            onClick={() => router.push('/api/auth/signin')}
+            onClick={() =>
+              signIn("discord", { callbackUrl: "/" })
+            }
             className="w-full flex items-center justify-center gap-3 py-4 bg-[#5865F2]/5 hover:bg-[#5865F2]/10 text-[#5865F2] rounded-xl text-sm font-medium transition-colors"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">

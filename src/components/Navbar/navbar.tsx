@@ -15,9 +15,12 @@ export default function Navbar() {
     const pathname = usePathname();
     const router = useRouter();
     const [showSidebar, setShowSidebar] = useState(false);
+
     const { data: cartCount = 0, isLoading: cartLoading } = api.cart.getCartCount.useQuery(undefined, {
-        enabled: isAuthenticated
+        enabled: isAuthenticated && !authLoading,
+        retry: false,
     });
+
     const navigate = (path: string) => {
         if (!isAuthenticated && (path === "/create" || path === "/cart")) {
             router.push("/login");
@@ -26,7 +29,8 @@ export default function Navbar() {
             setShowSidebar(false);
         }
     };
-    if (pathname.startsWith("/login") || pathname.startsWith("/register") || pathname.startsWith("/confirm") || pathname.startsWith("/forgot-password")) {
+
+    if (["/login", "/register", "/confirm", "/forgot-password"].some((p) => pathname.startsWith(p))) {
         return null;
     }
 
@@ -35,11 +39,7 @@ export default function Navbar() {
             <div className="sticky top-0 z-50 bg-white border-b">
                 <div className="max-w-7xl mx-auto">
                     <div className="flex items-center justify-between h-14 px-5">
-                        <Link
-                            href="/"
-                            onClick={(e) => { e.preventDefault(); navigate("/"); }}
-                            className="text-lg font-bold text-blue-600"
-                        >
+                        <Link href="/" onClick={(e) => { e.preventDefault(); navigate("/"); }} className="text-lg font-bold text-blue-600">
                             MyMarket
                         </Link>
 
@@ -58,41 +58,32 @@ export default function Navbar() {
                                 </>
                             ) : isAuthenticated ? (
                                 <>
-                                    <button
-                                        onClick={() => navigate("/create")}
-                                        className="flex border py-3 px-5 bg-yellow-100 gap-2 rounded-xl items-center"
-                                    >
+                                    <button onClick={() => navigate("/create")} className="flex border py-3 px-5 bg-yellow-100 gap-2 rounded-xl items-center">
                                         <CirclePlus className="text-yellow-500" size={18} />
                                         <span className="text-xs">Add</span>
                                     </button>
-                                    <button
-                                        onClick={() => navigate("/chat")}
-                                        className="flex flex-col items-center gap-1"
-                                    >
+
+                                    <button onClick={() => navigate("/chat")} className="flex flex-col items-center gap-1">
                                         <Mail size={18} />
                                     </button>
-                                    <button
-                                        onClick={() => navigate("/cart")}
-                                        className="flex flex-col items-center gap-1 relative"
-                                    >
+
+                                    <button onClick={() => navigate("/cart")} className="flex flex-col items-center gap-1 relative">
                                         <div className="relative">
                                             <ShoppingCart size={18} />
                                             {cartLoading ? (
                                                 <Skeleton className="absolute -top-2 -right-2 w-4 h-4 rounded-full" />
-                                            ) : cartCount > 0 && (
+                                            ) : cartCount > 0 ? (
                                                 <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
                                                     {cartCount}
                                                 </span>
-                                            )}
+                                            ) : null}
                                         </div>
                                     </button>
+
                                     <Dropdown />
                                 </>
                             ) : (
-                                <button
-                                    onClick={() => navigate("/login")}
-                                    className="flex flex-col items-center gap-1"
-                                >
+                                <button onClick={() => navigate("/login")} className="flex flex-col items-center gap-1">
                                     <User size={18} />
                                     <span className="text-xs">Sign In</span>
                                 </button>
@@ -102,36 +93,28 @@ export default function Navbar() {
                 </div>
             </div>
 
+            {/* Mobile bottom bar */}
             <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t py-2 flex justify-between items-center shadow-md z-50 px-6">
-                <button
-                    onClick={() => navigate("/")}
-                    className="flex flex-col items-center gap-1"
-                >
+                <button onClick={() => navigate("/")} className="flex flex-col items-center gap-1">
                     <Home size={18} />
                     <span className="text-xs">Home</span>
                 </button>
 
-                <button
-                    onClick={() => navigate("/create")}
-                    className="flex flex-col items-center gap-1"
-                >
+                <button onClick={() => navigate("/create")} className="flex flex-col items-center gap-1">
                     <CirclePlus size={18} className="text-yellow-500" />
                     <span className="text-xs">Add</span>
                 </button>
 
-                <button
-                    onClick={() => navigate("/cart")}
-                    className="flex flex-col items-center gap-1"
-                >
+                <button onClick={() => navigate("/cart")} className="flex flex-col items-center gap-1">
                     <div className="relative">
                         <ShoppingCart size={18} />
                         {cartLoading ? (
                             <Skeleton className="absolute -top-2 -right-2 w-4 h-4 rounded-full" />
-                        ) : cartCount > 0 && (
+                        ) : cartCount > 0 ? (
                             <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-[10px] rounded-full w-3.5 h-3.5 flex items-center justify-center">
                                 {cartCount}
                             </span>
-                        )}
+                        ) : null}
                     </div>
                     <span className="text-xs">Cart</span>
                 </button>
@@ -139,22 +122,12 @@ export default function Navbar() {
                 {authLoading ? (
                     <Skeleton className="w-6 h-6 rounded-full" />
                 ) : isAuthenticated ? (
-                    <button
-                        onClick={() => setShowSidebar(true)}
-                        className="flex flex-col items-center gap-1"
-                    >
-                        <img
-                            src={authUser?.image || "/user-male.svg"}
-                            alt="Profile"
-                            className="w-6 h-6 rounded-full border"
-                        />
+                    <button onClick={() => setShowSidebar(true)} className="flex flex-col items-center gap-1">
+                        <img src={authUser?.image || "/user-male.svg"} alt="Profile" className="w-6 h-6 rounded-full border" />
                         <span className="text-xs">Profile</span>
                     </button>
                 ) : (
-                    <button
-                        onClick={() => navigate("/login")}
-                        className="flex flex-col items-center gap-1"
-                    >
+                    <button onClick={() => navigate("/login")} className="flex flex-col items-center gap-1">
                         <User size={18} />
                         <span className="text-xs">Sign In</span>
                     </button>

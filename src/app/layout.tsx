@@ -2,11 +2,7 @@ import "~/styles/globals.css";
 
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
-
-import { TRPCReactProvider } from "~/trpc/react";
-import { SessionProvider } from "next-auth/react";
-import { Suspense } from "react";
-import Navbar from "~/components/Navbar/navbar";
+import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -20,14 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
       <body>
-        <SessionProvider>
-          <TRPCReactProvider>
-            <Suspense fallback={<div>Loading...</div>}>
-              <Navbar />
-              {children}
-            </Suspense>
-          </TRPCReactProvider>
-        </SessionProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

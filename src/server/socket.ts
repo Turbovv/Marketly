@@ -1,11 +1,12 @@
 import { Server } from "socket.io";
-import { Server as HttpServer } from "http";
+import type { Server as HttpServer } from "http";
 
 export const initializeSocket = (server: HttpServer) => {
   const io = new Server(server, {
     cors: {
-      origin: "*",
+      origin: "http://localhost:3000",
       methods: ["GET", "POST"],
+      credentials: true,
     },
     transports: ["websocket"],
     pingTimeout: 30000,

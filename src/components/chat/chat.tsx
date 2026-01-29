@@ -60,11 +60,7 @@ export default function Chat({
     const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
 
     const newSocket = io(socketUrl, {
-      transports: ['websocket'],
-      reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000,
-      timeout: 20000,
+      transports: ['websocket', 'polling'] 
     });
 
     newSocket.on('connect', () => {
@@ -118,7 +114,7 @@ export default function Chat({
         createdAt: msg.createdAt.toString()
       })));
     }
-  }, [chatMessages]);
+  }, [chatMessages, conversationId]);
 
   useEffect(() => {
     const scrollToBottom = () => {
@@ -163,8 +159,7 @@ export default function Chat({
         content: messageData.content
       });
     } catch (error) {
-      console.error("Failed to send message:", error);
-      setAllMessages(prev => prev.filter(msg => msg.id !== messageData.id));
+      console.log("Failed to send message:", error);
     }
   };
 
