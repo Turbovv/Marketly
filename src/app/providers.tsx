@@ -9,8 +9,8 @@ export function Providers({ children }: { children: ReactNode }) {
   return (
     <SessionProvider>
       <TRPCReactProvider>
-        <Navbar />
         <Suspense fallback={<div>Loading...</div>}>
+          <Navbar />
           {children}
         </Suspense>
       </TRPCReactProvider>

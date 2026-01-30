@@ -18,7 +18,7 @@ export default function LogOutButton() {
         if (authUser.userType === "jwt") {
             Cookies.remove("token", { path: "/" });
         } else {
-            await signOut({ redirect: false });
+            await signOut({ redirect: false, callbackUrl: "/" });
         }
         window.location.href = "/";
     };
