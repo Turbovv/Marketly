@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "next build",
+    "socket": "node --loader ts-node/esm src/server/server.ts",
     "check": "next lint && tsc --noEmit",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",

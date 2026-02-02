@@ -4,11 +4,11 @@ import type { Server as HttpServer } from "http";
 export const initializeSocket = (server: HttpServer) => {
   const io = new Server(server, {
     cors: {
-      origin: "http://localhost:3000",
+      origin: true,
       methods: ["GET", "POST"],
       credentials: true,
     },
-    transports: ["websocket"],
+    transports: ["websocket", "polling"],
     pingTimeout: 30000,
     pingInterval: 10000,
     maxHttpBufferSize: 1e6,
