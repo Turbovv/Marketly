@@ -2,14 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { cn } from "~/lib/utils";
-
-interface ChatListProps {
-  conversations: any[];
-  selectedId: number | null;
-  search: string;
-  setSearch: (val: string) => void;
-  userId: string;
-}
+import type { ChatListProps } from "./types";
 
 export default function ChatList({
   conversations,

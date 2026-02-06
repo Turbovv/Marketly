@@ -8,15 +8,9 @@ import { useRouter } from "next/navigation";
 import DeleteConversationButton from "./delete-chat";
 import { useAuth } from "~/hooks/useAuth";
 import { ArrowLeft } from "lucide-react";
+import type { Socket } from "socket.io-client";
+import type { Message } from "./types";
 
-type Message = {
-  id: number | string;
-  content: string;
-  senderId: string;
-  senderName: string | null;
-  createdAt: string;
-  conversationId?: number;
-};
 
 export default function Chat({
   conversationId,
@@ -29,7 +23,7 @@ export default function Chat({
   const userName = authUser?.name ?? "Unknown User";
   const router = useRouter();
   const messageContainerRef = useRef<HTMLDivElement>(null);
-  const socketRef = useRef<any>(null);
+  const socketRef = useRef<Socket | null>(null);
 
   const [message, setMessage] = useState("");
   const [allMessages, setAllMessages] = useState<Message[]>([]);
