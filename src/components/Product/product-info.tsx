@@ -9,6 +9,7 @@ import { formatDate } from "~/lib/format";
 import ProductEditForm from "./product-edit-form";
 import SendMessageModal from "./SendMessageModal/sendmessage-modal";
 import DeleteProductButton from "./delete-product";
+import { slugify } from "~/utils/slug";
 
 interface ProductInfoProps {
   product: any;
@@ -103,9 +104,7 @@ export default function ProductInfo({
         {product?.category && product?.subcategory && (
           <>
             <Link
-              href={`/category/${encodeURIComponent(product.category)}/${encodeURIComponent(
-                product.subcategory
-              )}`}
+              href={`/category/${slugify(product.category)}/${slugify(product.subcategory)}`}
               className="hover:underline text-gray-500"
             >
               {product.category}
@@ -117,9 +116,7 @@ export default function ProductInfo({
         {product?.subcategory && (
           <>
             <Link
-              href={`/category/${encodeURIComponent(product.category)}/${encodeURIComponent(
-                product.subcategory
-              )}`}
+              href={`/category/${slugify(product.category)}/${slugify(product.subcategory)}`}
               className="hover:underline text-gray-500"
             >
               {product.subcategory}

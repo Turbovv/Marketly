@@ -31,7 +31,7 @@ export const CATEGORIES = [
        ],
      },
      {
-       category: "Children's Products",
+       category: "Children Products",
        items: [
          { name: "Toys", icon: Puzzle },
          { name: "Clothing", icon: Shirt },

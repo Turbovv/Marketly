@@ -7,11 +7,13 @@ import { useState } from "react";
 import SortDropdown from "~/components/Search/sort-dropdown";
 import { sortProducts } from "~/utils/sortProducts";
 import { ChevronRight } from "lucide-react";
-
+import { slugify, unslugify } from "~/utils/slug";
 export default function CategoryPage() {
   const params = useParams();
-  const category = params.category as string;
-  const subcategory = (params.subcategory as string)?.replace(/-/g, " ");
+  const category = unslugify(params.category as string);
+  const subcategory = params.subcategory
+    ? unslugify(params.subcategory as string)
+    : undefined;
   const [sortOption, setSortOption] = useState("");
 
   const { data: products, isLoading } = api.products.getProductsByCategory.useQuery(
@@ -28,7 +30,7 @@ export default function CategoryPage() {
         <nav className="flex items-center text-sm text-gray-500 mb-6">
           <Link href="/" className="hover:text-blue-600">Home</Link>
           <ChevronRight className="w-4 h-4 mx-2" />
-          <Link href={`/category/${category}`} className="hover:text-blue-600">{category}</Link>
+          <Link href={`/category/${slugify(category)}`} className="hover:text-blue-600">{category}</Link>
           {subcategory && (
             <>
               <ChevronRight className="w-4 h-4 mx-2" />

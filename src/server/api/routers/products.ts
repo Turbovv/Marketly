@@ -52,10 +52,18 @@ export const productsRouter = createTRPCRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
-      const whereConditions = [ilike(products.category, input.category)];
+      const normalize = (v: string) =>
+        v.toLowerCase().replace(/[-']/g, " ").trim();
 
-      if (input.subcategory) {
-        whereConditions.push(ilike(products.subcategory, input.subcategory));
+      const category = normalize(input.category);
+      const subcategory = input.subcategory
+        ? normalize(input.subcategory)
+        : undefined;
+
+      const whereConditions = [ilike(products.category, `%${category}%`)];
+
+      if (subcategory) {
+        whereConditions.push(ilike(products.subcategory, `%${subcategory}%`));
       }
 
       return await ctx.db.query.products.findMany({

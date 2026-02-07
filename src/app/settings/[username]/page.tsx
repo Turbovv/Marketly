@@ -39,7 +39,9 @@ export default function UserSettingsPage() {
     <div className="min-h-screen flex items-center justify-center">
       <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-8 py-16">
         <div className="hidden lg:block">
-          <Sidebar setShowMobileSidebar={setShowMobileSidebar} />
+          {isAuthenticated && authUser && (
+            <Sidebar setShowMobileSidebar={setShowMobileSidebar} />
+          )}
         </div>
 
         <div className="bg-white shadow-md rounded-lg p-6 space-y-6 lg:col-span-1">
