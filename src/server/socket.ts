@@ -4,7 +4,7 @@ import type { Server as HttpServer } from "http";
 export const initializeSocket = (server: HttpServer) => {
   const io = new Server(server, {
     cors: {
-      origin: true,
+      origin: ["http://localhost:3000", "https://mymarket-tau.vercel.app"],
       methods: ["GET", "POST"],
       credentials: true,
     },
