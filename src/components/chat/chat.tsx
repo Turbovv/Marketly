@@ -5,11 +5,11 @@ import { api } from "~/trpc/react";
 import io from "socket.io-client";
 import { formatDate } from "~/lib/format";
 import { useRouter } from "next/navigation";
-import DeleteConversationButton from "./delete-chat";
+import DeleteConversationButton from "./delete-chat.tsx";
 import { useAuth } from "~/hooks/useAuth";
 import { ArrowLeft } from "lucide-react";
 import type { Socket } from "socket.io-client";
-import type { Message } from "./types";
+import type { Message } from "./types.ts";
 
 
 export default function Chat({

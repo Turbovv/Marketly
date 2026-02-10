@@ -1,7 +1,7 @@
 "use client";
 
-import Chat from "~/components/chat/chat";
-import type { ChatSectionProps } from "./types";
+import Chat from "~/components/Chat/chat";
+import type { ChatSectionProps } from "./types.ts";
 
 export default function ChatSection({
   selectedId,

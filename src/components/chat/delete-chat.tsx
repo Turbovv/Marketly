@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
 } from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
-import type { DeleteConversationButtonProps } from "./types";
+import type { DeleteConversationButtonProps } from "./types.ts";
 
 export default function DeleteConversationButton({ conversationId }: DeleteConversationButtonProps) {
   const router = useRouter();
