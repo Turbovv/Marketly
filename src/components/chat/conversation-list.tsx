@@ -1,8 +1,7 @@
-"use client";
 
 import { useRouter } from "next/navigation";
 import { cn } from "~/lib/utils";
-import type { ChatListProps } from "./types.ts";
+import type { ChatListProps } from "./types";
 
 export default function ChatList({
   conversations,

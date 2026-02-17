@@ -8,8 +8,8 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-} from "../ui/dropdown-menu";
-import { Button } from "../ui/button";
+} from "../ui/dropdown-menu.tsx";
+import { Button } from "../ui/button.tsx";
 import type { DeleteConversationButtonProps } from "./types.ts";
 
 export default function DeleteConversationButton({ conversationId }: DeleteConversationButtonProps) {

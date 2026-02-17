@@ -1,4 +1,3 @@
-"use client";
 
 import { TRPCReactProvider } from "~/trpc/react";
 import { SessionProvider } from "next-auth/react";

@@ -10,7 +10,7 @@ export function middleware(request: NextRequest) {
 
   const protectedRoutes = ["/chat", "/cart", "/create"];
 
-  const authRoutes = ["/login", "/register", "/confirm", "/forgot-password"];
+  const authRoutes = ["/login", "/register"];
 
   const isProtected = protectedRoutes.some((route) =>
     request.nextUrl.pathname.startsWith(route)
@@ -19,6 +19,21 @@ export function middleware(request: NextRequest) {
   const isAuthRoute = authRoutes.some((route) =>
     request.nextUrl.pathname.startsWith(route)
   );
+
+  // Prevent direct access to /confirm without token parameter
+  if (request.nextUrl.pathname.startsWith("/confirm")) {
+    const token = request.nextUrl.searchParams.get("token");
+    if (!token) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+  }
+
+  // Prevent direct access to /forgot-password for authenticated users
+  if (request.nextUrl.pathname.startsWith("/forgot-password")) {
+    if (jwtToken || nextAuthToken) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+  }
 
   // Redirect unauthenticated users from protected routes to /login
   if (isProtected && !jwtToken && !nextAuthToken) {
