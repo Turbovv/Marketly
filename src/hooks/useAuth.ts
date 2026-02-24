@@ -3,81 +3,118 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { api } from "~/trpc/react";
-import Cookies from "js-cookie";
 import { TRPCClientError } from "@trpc/client";
 
-export interface JWTUser {
+/**
+ * Unified authenticated user type using discriminated union
+ * userType field distinguishes between OAuth and JWT authentication methods
+ */
+export type AuthUser = {
   id: string;
   name: string;
   email: string;
-  userType: "jwt";
-  image?: string;
-}
+  image: string;
+  userType: "oauth" | "jwt";
+};
 
-export interface NextAuthUser {
-  id: string;
-  name: string;
-  email: string;
-  userType: "next-auth";
-  image?: string;
-}
-
+/**
+ * Custom hook for managing dual authentication (OAuth + JWT)
+ *
+ * Supports two authentication flows:
+ * 1. NextAuth with OAuth providers (social login)
+ * 2. JWT with email/password registration
+ *
+ * OAuth takes precedence if both are present.
+ *
+ * @returns {Object} Authentication state and user data
+ * @returns {AuthUser | null} authUser - Current authenticated user or null
+ * @returns {string | undefined} userId - Current user's ID
+ * @returns {"oauth" | "jwt" | undefined} userType - Authentication method
+ * @returns {boolean} isAuthenticated - Whether user is logged in
+ * @returns {boolean} isLoading - Whether auth status is being checked
+ */
 export const useAuth = () => {
+  // NextAuth session (OAuth users like GitHub, Google, etc.)
   const { data: nextAuthSession, status: nextAuthStatus } = useSession();
-  const [jwtUser, setJwtUser] = useState<JWTUser | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [checked, setChecked] = useState(false);
 
-  const { data: userData, error }: any = api.user.getUser.useQuery(undefined, { retry: false });
+  // JWT user data from API (email/password users)
+  const { data: jwtUserData, error: jwtError } = api.user.getUser.useQuery(
+    undefined,
+    { retry: false },
+  );
 
+  // Track when authentication check is complete
+  const [isAuthCheckComplete, setIsAuthCheckComplete] = useState(false);
+
+  /**
+   * Effect: Mark auth check as complete when we have results from both auth methods
+   * This prevents rendering before we know the actual auth state
+   */
   useEffect(() => {
-    if (error instanceof TRPCClientError) {
-      setJwtUser(null);
-      setIsAuthenticated(false);
-      setChecked(true);
-    }
-  }, [error]);
+    const nextAuthLoading = nextAuthStatus === "loading";
+    const jwtCheckComplete =
+      jwtError instanceof TRPCClientError || !!jwtUserData;
 
-  useEffect(() => {
-    if (userData) {
-      setJwtUser(userData);
-      setIsAuthenticated(true);
-      if (userData.newToken) {
-        Cookies.set("token", userData.newToken, { expires: 7, sameSite: "lax", path: "/" });
-      }
-      setChecked(true);
-    } else if (nextAuthSession?.user) {
-      setIsAuthenticated(true);
-      setChecked(true);
-    } else if (nextAuthStatus !== "loading") {
-      setIsAuthenticated(false);
-      setChecked(true);
+    // Once NextAuth finishes loading and JWT check is done, we're ready
+    if (!nextAuthLoading && jwtCheckComplete) {
+      setIsAuthCheckComplete(true);
     }
-  }, [userData, nextAuthSession, nextAuthStatus]);
+  }, [nextAuthStatus, jwtError, jwtUserData]);
 
-  const authUser = nextAuthSession?.user
-    ? {
-        id: nextAuthSession.user.id || "",
-        name: nextAuthSession.user.name || "Guest",
-        email: nextAuthSession.user.email || "",
-        image: nextAuthSession.user.image || "/user-male.svg",
-        userType: "next-auth" as const,
-      }
-    : jwtUser
-    ? {
-        id: jwtUser.id,
-        name: jwtUser.name,
-        email: jwtUser.email,
-        image: jwtUser.image || "/user-male.svg",
-        userType: "jwt" as const,
-      }
-    : null;
+  /**
+   * Resolve authenticated user from either authentication method
+   * Priority: OAuth (NextAuth) > JWT
+   * If user is signed in via OAuth, that takes precedence over JWT
+   */
+  const authUser: AuthUser | null = resolveAuthUser(
+    nextAuthSession,
+    jwtUserData,
+  );
+  const isAuthenticated = !!authUser;
+  const isLoading = nextAuthStatus === "loading" || !isAuthCheckComplete;
 
   return {
-    isAuthenticated,
+    // User information
     authUser,
     userType: authUser?.userType,
     userId: authUser?.id,
-    isLoading: nextAuthStatus === "loading" || !checked,
+
+    // Status flags
+    isAuthenticated,
+    isLoading,
   };
 };
+
+/**
+ * Helper: Resolve which user to use (OAuth or JWT)
+ * Returns NextAuth user if present, otherwise JWT user
+ */
+function resolveAuthUser(
+  nextAuthSession: ReturnType<typeof useSession>["data"],
+  jwtUserData: any,
+): AuthUser | null {
+  // Priority 1: NextAuth (OAuth) user
+  if (nextAuthSession?.user) {
+    return {
+      id: nextAuthSession.user.id || "",
+      name: nextAuthSession.user.name || "Guest",
+      email: nextAuthSession.user.email || "",
+      image: nextAuthSession.user.image || "/user-male.svg",
+      userType: "oauth",
+    };
+  }
+
+  // Priority 2: JWT user
+  if (jwtUserData) {
+    return {
+      id: jwtUserData.id,
+      name: jwtUserData.name,
+      email: jwtUserData.email,
+      image: jwtUserData.image || "/user-male.svg",
+      userType: "jwt",
+    };
+  }
+
+  // No user authenticated
+  return null;
+}

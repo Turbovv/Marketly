@@ -3,64 +3,32 @@ import superjson from "superjson";
 import { ZodError } from "zod";
 import { auth } from "~/server/auth";
 import { db } from "../db";
-import jwt from "jsonwebtoken";
-import { parse } from "cookie";
-
-const JWT_SECRET = process.env.JWT_SECRET || "+8APs0PI/xDA6v42wSxTcS++8hdIC6/5r1taMlGaq/I=";
+import {
+  getUserFromJwtToken,
+  type AuthenticatedUser,
+} from "~/server/auth-utils";
 
 interface CreateContextOptions {
   headers: Headers;
 }
 
 export const createTRPCContext = async (opts: CreateContextOptions) => {
+  // Get session from NextAuth (OAuth users)
   const session = await auth();
 
-  let jwtUser: null | {
-    userId: string;
-    email: string;
-    name: string;
-    userType: string;
-  } = null;
+  // Get user from JWT token (JWT users)
+  // This allows users to authenticate without NextAuth/OAuth
+  const jwtUser = getUserFromJwtToken(opts.headers);
 
-  const authHeader = opts.headers.get("authorization");
-  let token: string | null = null;
-
-  if (authHeader?.startsWith("Bearer ")) {
-    token = authHeader.substring(7);
-  }
-
-  if (!token) {
-    const cookieHeader = opts.headers.get("cookie") || "";
-    const cookies = parse(cookieHeader);
-    token = cookies.token || null;
-  }
-
-  if (token) {
-    try {
-      const decoded = jwt.verify(token, JWT_SECRET) as {
-        userId: string;
-        email: string;
-        name: string;
-        userType: string;
-      };
-
-      jwtUser = decoded;
-    } catch (error) {
-      console.error("JWT verification failed:", error);
-    }
-  }
-
-  const user =
-    session?.user?.id
-      ? { id: session.user.id, type: "oauth" }
-      : jwtUser?.userId
-      ? { id: jwtUser.userId, type: "jwt" }
-      : null;
+  // Resolve final user: prioritize OAuth session, fallback to JWT
+  // This supports dual authentication: users can log in with either method
+  const user: AuthenticatedUser | null = session?.user?.id
+    ? { id: session.user.id, type: "oauth" }
+    : jwtUser;
 
   return {
     db,
     session,
-    jwtUser,
     user,
     headers: opts.headers,
   };

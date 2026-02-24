@@ -7,11 +7,8 @@ import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import { TRPCError } from "@trpc/server";
 import crypto from "crypto";
-import { parse } from "cookie";
+import { getJwtSecret, extractTokenFromHeaders } from "~/server/auth-utils";
 
-const JWT_SECRET =
-  process.env.JWT_SECRET ||
-  "134c8571e17ee7d8d06db23af81d700b8c1437e732b089b67c4a59612ea8e25cab7cea0183060231f3d24e38401f2b1925229859e3107ea631397a1b676b2119ff2766bfd9e04b50cb680051578a8481eee0167efa60ec6431a8d9bee1941180fb322161dfeae68b65e1e165040651a5dc6383fd79108d4d2622c796d66943a13acf7ba227922f1c27b3c0986131384e3cc991f6c2c7d7b083aa01e82bfa39b4f363f641d1b58e5b972824660a6ff0af157fc0ab4e1d031b5002a60304c140ad8ffa9cb33cefd3232ee278ac08173f2823cb69976b5b90551991ba52493eb3976f6f3f0ec00ac0cc2ff2371a26985455309e209ef4826c3b322ce7438b6c0679";
 const EMAIL_USER = process.env.EMAIL_USER;
 const EMAIL_PASS = process.env.EMAIL_PASS;
 
@@ -59,7 +56,7 @@ export const authRouter = createTRPCRouter({
           confirmationCode,
           userType: "jwt",
         },
-        JWT_SECRET,
+        getJwtSecret(),
         // { expiresIn: '15m' }
       );
 
@@ -85,7 +82,7 @@ export const authRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        const decoded = jwt.verify(input.token, JWT_SECRET) as {
+        const decoded = jwt.verify(input.token, getJwtSecret()) as {
           name: string;
           email: string;
           password: string;
@@ -125,7 +122,7 @@ export const authRouter = createTRPCRouter({
             name: newUser?.name,
             userType: "jwt",
           },
-          JWT_SECRET,
+          getJwtSecret(),
         );
 
         return { message: "Email confirmed", token: authToken };
@@ -184,7 +181,7 @@ export const authRouter = createTRPCRouter({
           name: user.name,
           userType: "jwt",
         },
-        JWT_SECRET,
+        getJwtSecret(),
       );
 
       return {
@@ -210,16 +207,7 @@ export const authRouter = createTRPCRouter({
     }
 
     try {
-      let token: string | null = null;
-
-      const authHeader =
-        ctx.headers.get("authorization") || ctx.headers.get("Authorization");
-      if (authHeader?.startsWith("Bearer ")) token = authHeader.substring(7);
-
-      if (!token) {
-        const cookies = parse(ctx.headers.get("cookie") || "");
-        token = cookies.token || null;
-      }
+      const token = extractTokenFromHeaders(ctx.headers);
 
       if (!token)
         throw new TRPCError({
@@ -227,7 +215,7 @@ export const authRouter = createTRPCRouter({
           message: "No token found",
         });
 
-      const decoded = jwt.verify(token, JWT_SECRET) as {
+      const decoded = jwt.verify(token, getJwtSecret()) as {
         userId: string;
         email: string;
         name: string;
@@ -275,7 +263,7 @@ export const authRouter = createTRPCRouter({
           email: user.email,
           resetCode,
         },
-        JWT_SECRET,
+        getJwtSecret(),
         { expiresIn: "15m" },
       );
 
@@ -302,7 +290,7 @@ export const authRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        const decoded = jwt.verify(input.token, JWT_SECRET) as {
+        const decoded = jwt.verify(input.token, getJwtSecret()) as {
           userId: string;
           resetCode: string;
         };
@@ -338,7 +326,7 @@ export const authRouter = createTRPCRouter({
     )
     .mutation(async ({ input }) => {
       try {
-        const decoded = jwt.verify(input.token, JWT_SECRET) as {
+        const decoded = jwt.verify(input.token, getJwtSecret()) as {
           resetCode: string;
         };
 

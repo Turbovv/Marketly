@@ -8,7 +8,7 @@ import { TRPCError } from "@trpc/server";
 
 export const chatRouter = createTRPCRouter({
   getConversations: protectedProcedure.query(async ({ ctx }) => {
-    const userId = ctx.session?.user?.id || ctx.jwtUser?.userId;
+    const userId = ctx.user?.id;
 
     if (!userId) {
       throw new TRPCError({ code: "UNAUTHORIZED" });
@@ -52,7 +52,7 @@ export const chatRouter = createTRPCRouter({
   getConversation: protectedProcedure
     .input(z.object({ conversationId: z.number() }))
     .query(async ({ ctx, input }) => {
-      const userId = ctx.session?.user?.id || ctx.jwtUser?.userId;
+      const userId = ctx.user?.id;
 
       if (!userId) {
         throw new TRPCError({ code: "UNAUTHORIZED" });
@@ -99,7 +99,7 @@ export const chatRouter = createTRPCRouter({
   createConversation: protectedProcedure
     .input(z.object({ sellerId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const userId = ctx.session?.user?.id || ctx.jwtUser?.userId;
+      const userId = ctx.user?.id;
 
       if (!userId) {
         throw new TRPCError({ code: "UNAUTHORIZED" });
@@ -134,7 +134,7 @@ export const chatRouter = createTRPCRouter({
   sendMessage: protectedProcedure
     .input(z.object({ conversationId: z.number(), content: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const userId = ctx.session?.user?.id || ctx.jwtUser?.userId;
+      const userId = ctx.user?.id;
 
       if (!userId) {
         throw new TRPCError({ code: "UNAUTHORIZED" });
@@ -155,7 +155,7 @@ export const chatRouter = createTRPCRouter({
   getMessages: protectedProcedure
     .input(z.object({ conversationId: z.number() }))
     .query(async ({ ctx, input }) => {
-      const userId = ctx.session?.user?.id || ctx.jwtUser?.userId;
+      const userId = ctx.user?.id;
 
       if (!userId) {
         throw new TRPCError({ code: "UNAUTHORIZED" });
@@ -177,7 +177,7 @@ export const chatRouter = createTRPCRouter({
   deleteConversation: protectedProcedure
     .input(z.object({ conversationId: z.number() }))
     .mutation(async ({ ctx, input }) => {
-      const userId = ctx.session?.user?.id || ctx.jwtUser?.userId;
+      const userId = ctx.user?.id;
 
       if (!userId) {
         throw new TRPCError({ code: "UNAUTHORIZED" });
@@ -218,7 +218,7 @@ export const chatRouter = createTRPCRouter({
   searchConversations: protectedProcedure
     .input(z.object({ searchTerm: z.string() }))
     .query(async ({ ctx, input }) => {
-      const userId = ctx.session?.user?.id || ctx.jwtUser?.userId;
+      const userId = ctx.user?.id;
       const term = input.searchTerm.toLowerCase();
 
       if (!userId) {

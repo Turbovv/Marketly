@@ -9,9 +9,7 @@ import { products, users } from "~/server/db/schema";
 import { db } from "~/server/db";
 import jwt from "jsonwebtoken";
 import { TRPCError } from "@trpc/server";
-
-const JWT_SECRET =
-  process.env.JWT_SECRET || "+8APs0PI/xDA6v42wSxTcS++8hdIC6/5r1taMlGaq/I=";
+import { getJwtSecret } from "~/server/auth-utils";
 
 export const productsRouter = createTRPCRouter({
   getProducts: publicProcedure.query(async ({ ctx }) => {
@@ -155,7 +153,7 @@ export const productsRouter = createTRPCRouter({
     .input(z.object({ token: z.string() }))
     .query(async ({ input }) => {
       try {
-        const decoded = jwt.verify(input.token, JWT_SECRET);
+        const decoded = jwt.verify(input.token, getJwtSecret());
         return { success: true, user: decoded };
       } catch (error) {
         throw new TRPCError({
