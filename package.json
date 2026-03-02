@@ -49,7 +49,7 @@
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.476.0",
     "next": "^15.0.1",
-    "next-auth": "5.0.0-beta.25",
+    "next-auth": "5.0.0-beta.30",
     "nodemailer": "^6.10.1",
     "postgres": "^3.4.4",
     "react": "^18.3.1",
