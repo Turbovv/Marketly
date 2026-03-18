@@ -1,12 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { ClipLoader } from "react-spinners";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, FreeMode } from "swiper/modules";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { api } from "~/trpc/react";
-import ProductImageCarousel from "../Product/image-carousel";
+import ProductCard from "../Product/product-card";
+import { useAuth } from "~/hooks/useAuth";
 import "swiper/css";
 import "swiper/css/navigation";
 
@@ -17,6 +17,7 @@ type SimilarProductsProps = {
 
 export default function SimilarProducts({ category, productId }: SimilarProductsProps) {
   const { data: similarProducts, isLoading } = api.products.similarProducts.useQuery({ category, productId });
+  const { isAuthenticated, userId } = useAuth();
 
   if (isLoading) return <p><ClipLoader /></p>;
   if (!similarProducts || similarProducts.length === 0) return null;
@@ -48,34 +49,15 @@ export default function SimilarProducts({ category, productId }: SimilarProducts
         modules={[Navigation, FreeMode]}
         className="px-4"
       >
-        {similarProducts.map((product) => {
-          const images = [product.url, ...(product.imageUrls?.split(",") || [])];
-
-          return (
-            <SwiperSlide key={product.id}>
-              <Link href={`/products/${product.id}`} className="group block bg-white border rounded-lg hover:shadow">
-                <div className="relative h-44 overflow-hidden rounded-t-lg">
-                  <img
-                    src={images[0]}
-                    alt={product.name}
-                    className="w-full h-full object-cover group-hover:opacity-0"
-                  />
-                  <ProductImageCarousel
-                    images={images}
-                    className="absolute inset-0 opacity-0 group-hover:opacity-100 h-44"
-                  />
-                </div>
-                <div className="p-3 mt-2">
-                  <h3 className="text-sm font-medium truncate">{product.name}</h3>
-                  <p className="text-sm text-gray-500 truncate">{product.desc}</p>
-                  <p className="mt-4 text-base font-semibold">
-                    {product.price ? `${product.price.toLocaleString()} ₾` : "Price negotiable"}
-                  </p>
-                </div>
-              </Link>
-            </SwiperSlide>
-          );
-        })}
+        {similarProducts.map((product) => (
+          <SwiperSlide key={product.id}>
+            <ProductCard
+              product={product}
+              isAuthenticated={isAuthenticated}
+              userId={userId}
+            />
+          </SwiperSlide>
+        ))}
       </Swiper>
     </div>
   );

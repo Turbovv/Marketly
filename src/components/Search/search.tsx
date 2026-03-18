@@ -5,10 +5,13 @@ import { useSearchParams } from "next/navigation";
 import SortDropdown from "~/components/Search/sort-dropdown";
 import { api } from "~/trpc/react";
 import { sortProducts } from "~/utils/sortProducts";
+import ProductCard from "~/components/Product/product-card";
+import { useAuth } from "~/hooks/useAuth";
 
 export default function SearchResults() {
   const searchParams = useSearchParams();
   const query = searchParams?.get("query") || "";
+  const { isAuthenticated, userId } = useAuth();
   const { data: products, isLoading } = api.products.searchProducts.useQuery(
     { query },
     { enabled: query.trim() !== "" }
@@ -39,17 +42,12 @@ export default function SearchResults() {
         ) : filteredProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {filteredProducts.map((product) => (
-              <div key={product.id} className="bg-white border border-gray-200 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300">
-                <img
-                  src={product.url}
-                  alt={product.name}
-                  className="w-full h-48 object-cover rounded-t-lg"
-                />
-                <div className="p-4">
-                  <h2 className="text-xl font-semibold text-gray-800">{product.name}</h2>
-                  <p className="text-lg font-medium text-gray-500 mt-2">${product.price}</p>
-                </div>
-              </div>
+              <ProductCard
+                key={product.id}
+                product={product}
+                isAuthenticated={isAuthenticated}
+                userId={userId}
+              />
             ))}
           </div>
         ) : (

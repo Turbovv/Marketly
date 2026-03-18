@@ -14,18 +14,21 @@ interface ProductCardProps {
   };
   isAuthenticated: boolean;
   userId?: string;
+  isInCart?: boolean;
 }
 
 export default function ProductCard({
   product,
   isAuthenticated,
   userId,
+  isInCart,
 }: ProductCardProps) {
   const images = [
     product.url,
     ...(product.imageUrls ? product.imageUrls.split(",") : []),
-  ].filter(Boolean);
-  const isOwner = userId === product.createdById;
+  ].filter((img): img is string => Boolean(img));
+
+  const isOwner = !!userId && userId === product.createdById;
 
   return (
     <div className="group relative block bg-white border rounded-lg hover:shadow">
@@ -54,6 +57,7 @@ export default function ProductCard({
       {isAuthenticated && !isOwner && (
         <CartToggleButton
           productId={product.id}
+          isInCart={isInCart}
           className="absolute bottom-10 lg:bottom-2 right-2 z-10"
         />
       )}

@@ -6,9 +6,9 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import SortDropdown from "~/components/Search/sort-dropdown";
 import { sortProducts } from "~/utils/sortProducts";
-import CartToggleButton from "~/components/Cart/cart-toggle";
 import { useAuth } from "~/hooks/useAuth";
 import Sidebar from "~/components/sidebar";
+import ProductCard from "~/components/Product/product-card";
 
 export default function UserSettings() {
   const params = useParams();
@@ -56,34 +56,12 @@ export default function UserSettings() {
                 <p>Loading products...</p>
               ) : products && products.length > 0 ? (
                 sortedProducts.map((product) => (
-                  <div key={product.id} className="relative">
-                    <Link
-                      href={`/products/${product.id}`}
-                      className="bg-white rounded-lg hover:shadow transition-shadow duration-200 group border border-gray-100 block"
-                    >
-                      <div className="relative h-44 overflow-hidden rounded-t-lg">
-                        <img
-                          src={product.url || "/placeholder.png"}
-                          alt={product.name}
-                          className="w-full h-full p-4 object-cover rounded-3xl group-hover:scale-105 transition-transform duration-200"
-                        />
-                      </div>
-                      <div className="p-3 mt-2 break-words">
-                        <h2 className="text-sm font-medium">{product.name}</h2>
-                        <p className="text-sm text-gray-500 w-full">{product.desc}</p>
-                        <hr />
-                        <div className="mt-4">
-                          <p className="text-base font-semibold text-gray-900">${product.price.toLocaleString()}</p>
-                        </div>
-                      </div>
-                    </Link>
-                    {isAuthenticated && authUser?.id !== product.createdById && (
-                      <CartToggleButton
-                        productId={product.id}
-                        className="absolute bottom-10 lg:bottom-2 right-2 z-10"
-                      />
-                    )}
-                  </div>
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    isAuthenticated={isAuthenticated}
+                    userId={authUser?.id}
+                  />
                 ))
               ) : (
                 <p className="text-gray-500">No products found.</p>

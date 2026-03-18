@@ -8,6 +8,8 @@ import SortDropdown from "~/components/Search/sort-dropdown";
 import { sortProducts } from "~/utils/sortProducts";
 import { ChevronRight } from "lucide-react";
 import { slugify, unslugify } from "~/utils/slug";
+import ProductCard from "~/components/Product/product-card";
+import { useAuth } from "~/hooks/useAuth";
 export default function Category() {
   const params = useParams();
   const category = unslugify(params.category as string);
@@ -15,6 +17,7 @@ export default function Category() {
     ? unslugify(params.subcategory as string)
     : undefined;
   const [sortOption, setSortOption] = useState("");
+  const { isAuthenticated, userId } = useAuth();
 
   const { data: products, isLoading } = api.products.getProductsByCategory.useQuery(
     { category, subcategory },
@@ -57,32 +60,12 @@ export default function Category() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {sortedProducts.map((product) => (
-            <Link 
-              href={`/products/${product.id}`}
+            <ProductCard
               key={product.id}
-              className="bg-white rounded-lg hover:shadow transition-shadow duration-200 group border border-gray-100"
-            >
-              <div className="relative h-44 overflow-hidden rounded-t-lg">
-                <img 
-                  src={product.url} 
-                  alt={product.name}
-                  className="w-full h-full p-4 object-cover rounded-3xl group-hover:scale-105 transition-transform duration-200"
-                />
-              </div>
-              <div className="p-3 mt-2 leading">
-                <h2 className="text-sm font-medium ">
-                  {product.name}
-                </h2>
-                <p className="text-sm font-medium text-gray-500 leading-8">
-                  {product.desc}
-                </p><hr />
-                <div className="mt-4">
-                  <p className="text-base font-semibold text-gray-900 ">
-                    ${product.price.toLocaleString()}
-                  </p>
-                </div>
-              </div>
-            </Link>
+              product={product}
+              isAuthenticated={isAuthenticated}
+              userId={userId}
+            />
           ))}
           </div>
       </div>
