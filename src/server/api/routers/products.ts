@@ -167,43 +167,67 @@ export const productsRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.number(),
-        name: z.string().optional(),
-        price: z.string().optional(),
-        desc: z.string().optional(),
-        url: z.string().optional(),
-        imageUrls: z.array(z.string()).optional(),
+        name: z.string().trim().min(1).max(255),
+        price: z.number().positive(),
+        desc: z.string().trim().min(1).max(500),
+        url: z.string().trim().url().optional(),
+        imageUrls: z.array(z.string().url()).max(11).optional(),
+        category: z.string().trim().min(1).max(255),
+        subcategory: z
+          .preprocess(
+            (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
+            z.string().trim().max(255).optional(),
+          ),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const userId = ctx.user.id;
-
-      const product = await ctx.db.query.products.findFirst({
+      const existingProduct = await ctx.db.query.products.findFirst({
         where: eq(products.id, input.id),
+        columns: { id: true, createdById: true },
       });
 
-      if (!product) {
+      if (!existingProduct) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Product not found",
         });
       }
 
-      if (product.createdById !== userId) {
+      if (existingProduct.createdById !== ctx.user.id) {
         throw new TRPCError({
           code: "FORBIDDEN",
           message: "Not authorized to update this product",
         });
       }
 
+      const updateData: {
+        name: string;
+        desc: string;
+        price: string;
+        category: string;
+        subcategory: string | null;
+        url?: string;
+        imageUrls?: string | null;
+      } = {
+        name: input.name,
+        desc: input.desc,
+        price: input.price.toString(),
+        category: input.category,
+        subcategory: input.subcategory ?? null,
+      };
+
+      if (input.url !== undefined) {
+        updateData.url = input.url;
+      }
+
+      if (input.imageUrls !== undefined) {
+        updateData.imageUrls =
+          input.imageUrls.length > 0 ? input.imageUrls.join(",") : null;
+      }
+
       await ctx.db
         .update(products)
-        .set({
-          ...(input.name && { name: input.name }),
-          ...(input.price && { price: input.price }),
-          ...(input.desc && { desc: input.desc }),
-          ...(input.url && { url: input.url }),
-          ...(input.imageUrls && { imageUrls: input.imageUrls.join(",") }),
-        })
+        .set(updateData)
         .where(eq(products.id, input.id));
 
       return { success: true };
