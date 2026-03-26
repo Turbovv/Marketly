@@ -1,4 +1,4 @@
-import CreateProduct from '~/components/Product/create-product'
+import CreateProduct from '~/components/Product/create/create-product'
 
 export default function CreateProductPage() {
   return (

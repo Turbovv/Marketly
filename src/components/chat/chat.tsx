@@ -2,12 +2,12 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import DeleteConversationButton from "./delete-chat.tsx";
+import DeleteConversationButton from "./conversations/delete-chat";
 import { ArrowLeft } from "lucide-react";
 
-import { useChat } from "./useChat.ts";
-import MessageList from "./message-list";
-import MessageInput from "./message-input";
+import { useChat } from "./hooks/useChat";
+import MessageList from "./messages/message-list";
+import MessageInput from "./messages/message-input";
 
 export default function Chat({
   conversationId,

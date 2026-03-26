@@ -6,9 +6,9 @@ import { api } from "~/trpc/react";
 import { useAuth } from "~/hooks/useAuth";
 import { MessageCircleMore, Pencil } from "lucide-react";
 import { formatDate } from "~/lib/format";
-import ProductEditForm from "./product-edit-form";
-import SendMessageModal from "./SendMessageModal/sendmessage-modal";
-import DeleteProductButton from "./delete-product";
+import ProductEditForm from "../edit/product-edit-form";
+import SendMessageModal from "../modals/send-message-modal";
+import DeleteProductButton from "../actions/delete-product";
 import { slugify } from "~/utils/slug";
 
 interface ProductInfoProps {

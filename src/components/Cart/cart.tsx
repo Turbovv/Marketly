@@ -3,7 +3,7 @@
 import { api } from "~/trpc/react";
 import Link from "next/link";
 import { useAuth } from "~/hooks/useAuth";
-import ProductCard from "~/components/Product/product-card";
+import ProductCard from "~/components/Product/card/product-card";
 
 export default function Cart() {
   const { data: cartItems, isLoading, error } = api.cart.getCart.useQuery();

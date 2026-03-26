@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import SortDropdown from "~/components/Search/sort-dropdown";
 import { api } from "~/trpc/react";
 import { sortProducts } from "~/utils/sortProducts";
-import ProductCard from "~/components/Product/product-card";
+import ProductCard from "~/components/Product/card/product-card";
 import { useAuth } from "~/hooks/useAuth";
 
 export default function SearchResults() {

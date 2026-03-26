@@ -5,7 +5,7 @@ import io from "socket.io-client";
 import { useAuth } from "~/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import type { Socket } from "socket.io-client";
-import type { Message } from "./types";
+import type { Message } from "../types/types";
 
 interface UseChatResult {
   messages: Message[];

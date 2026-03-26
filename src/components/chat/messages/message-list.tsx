@@ -1,6 +1,6 @@
 import React from "react";
 import { formatDate } from "~/lib/format";
-import type { Message } from "./types";
+import type { Message } from "../types/types";
 
 interface MessageListProps {
   messages: Message[];

@@ -3,8 +3,8 @@
 import { useParams, useRouter } from "next/navigation";
 
 import SimilarProducts from "~/components/SimilarProducts/similar-products";
-import ProductImageCarousel from "~/components/Product/image-carousel";
-import ProductInfo from "~/components/Product/product-info";
+import ProductImageCarousel from "~/components/Product/carousel/image-carousel";
+import ProductInfo from "~/components/Product/info/product-info";
 import CartToggleButton from "~/components/Cart/cart-toggle";
 
 import { api } from "~/trpc/react";

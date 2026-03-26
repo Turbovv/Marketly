@@ -1,6 +1,6 @@
 
 import Chat from "~/components/chat/chat";
-import type { ChatSectionProps } from "./types";
+import type { ChatSectionProps } from "../types/types";
 
 export default function ChatSection({
   selectedId,

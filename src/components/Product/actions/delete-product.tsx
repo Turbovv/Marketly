@@ -13,8 +13,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../ui/dialog";
-import { Button } from "../ui/button";
+} from "~/components/ui/dialog";
+import { Button } from "~/components/ui/button";
 
 export default function DeleteProductButton({ productId }: { productId: number }) {
   const [error, setError] = useState<string | null>(null);

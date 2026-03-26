@@ -8,7 +8,7 @@ import SortDropdown from "~/components/Search/sort-dropdown";
 import { sortProducts } from "~/utils/sortProducts";
 import { ChevronRight } from "lucide-react";
 import { slugify, unslugify } from "~/utils/slug";
-import ProductCard from "~/components/Product/product-card";
+import ProductCard from "~/components/Product/card/product-card";
 import { useAuth } from "~/hooks/useAuth";
 export default function Category() {
   const params = useParams();

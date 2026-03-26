@@ -1,6 +1,6 @@
 import Link from "next/link";
-import ProductImageCarousel from "./image-carousel";
-import CartToggleButton from "../Cart/cart-toggle";
+import ProductImageCarousel from "../carousel/image-carousel";
+import CartToggleButton from "~/components/Cart/cart-toggle";
 
 interface ProductCardProps {
   product: {

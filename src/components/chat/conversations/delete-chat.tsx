@@ -8,9 +8,9 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-} from "../ui/dropdown-menu.tsx";
-import { Button } from "../ui/button.tsx";
-import type { DeleteConversationButtonProps } from "./types.ts";
+} from "~/components/ui/dropdown-menu";
+import { Button } from "~/components/ui/button";
+import type { DeleteConversationButtonProps } from "../types/types";
 
 export default function DeleteConversationButton({ conversationId }: DeleteConversationButtonProps) {
   const router = useRouter();

@@ -8,7 +8,7 @@ import SortDropdown from "~/components/Search/sort-dropdown";
 import { sortProducts } from "~/utils/sortProducts";
 import { useAuth } from "~/hooks/useAuth";
 import Sidebar from "~/components/sidebar";
-import ProductCard from "~/components/Product/product-card";
+import ProductCard from "~/components/Product/card/product-card";
 
 export default function UserSettings() {
   const params = useParams();

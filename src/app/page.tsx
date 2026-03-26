@@ -1,4 +1,4 @@
-import ProductList from "~/components/Product/product-list";
+import ProductList from "~/components/Product/list/product-list";
 import SearchBar from "~/components/Search/search-bar";
 import { HydrateClient } from "~/trpc/server";
 

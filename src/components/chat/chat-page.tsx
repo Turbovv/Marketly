@@ -4,8 +4,8 @@ import { useEffect, useState, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { api } from "~/trpc/react";
 import { useAuth } from "~/hooks/useAuth";
-import ChatList from "~/components/chat/conversation-list";
-import ChatSection from "~/components/chat/chat-section";
+import ChatList from "~/components/chat/conversations/conversation-list";
+import ChatSection from "~/components/chat/messages/chat-section";
 
 export default function ChatPageClient() {
   const searchParams = useSearchParams();

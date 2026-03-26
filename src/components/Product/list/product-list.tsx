@@ -3,8 +3,8 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, FreeMode } from "swiper/modules";
 import { api } from "~/trpc/react";
-import CategoriesContainer from "../categories";
-import ProductCard from "./product-card";
+import CategoriesContainer from "~/components/categories";
+import ProductCard from "../card/product-card";
 import { useAuth } from "~/hooks/useAuth";
 import "swiper/css";
 import "swiper/css/navigation";
