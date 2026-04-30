@@ -1,24 +1,23 @@
 "use client";
 
-import { useParams } from "next/navigation";
 import { api } from "~/trpc/react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import SortDropdown from "~/components/Search/sort-dropdown";
 import { sortProducts } from "~/utils/sortProducts";
 import { useAuth } from "~/hooks/useAuth";
 import Sidebar from "~/components/sidebar";
 import ProductCard from "~/components/Product/card/product-card";
 
-export default function UserSettings() {
-  const params = useParams();
+interface UserSettingsProps {
+  username: string;
+}
+
+export default function UserSettings({ username }: UserSettingsProps) {
   const [sortOption, setSortOption] = useState("");
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
   const { authUser, isAuthenticated } = useAuth();
-  const decodedUsername = useMemo(() => {
-    if (!params?.username) return "";
-    return decodeURIComponent(params.username as string);
-  }, [params]);
+  const decodedUsername = decodeURIComponent(username);
 
   const { data: userProfile, isLoading: userLoading } = api.profile.getUserProfile.useQuery(
     { username: decodedUsername },

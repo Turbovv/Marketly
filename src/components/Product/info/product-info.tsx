@@ -1,21 +1,28 @@
 "use client";
 
-import React, { useState } from "react";
 import Link from "next/link";
+import React, { useState } from "react";
 import { api } from "~/trpc/react";
 import { useAuth } from "~/hooks/useAuth";
 import { MessageCircleMore, Pencil } from "lucide-react";
 import { formatDate } from "~/lib/format";
+import type {
+  Conversation,
+  Product,
+  ProductInfoRouter,
+  UpdateProductInput,
+  UserProducts,
+} from "~/components/Product";
 import ProductEditForm from "../edit/product-edit-form";
 import SendMessageModal from "../modals/send-message-modal";
 import DeleteProductButton from "../actions/delete-product";
 import { slugify } from "~/utils/slug";
 
 interface ProductInfoProps {
-  product: any;
-  userProducts?: any;
-  router: any;
-  existingConversation?: any;
+  product: Product;
+  userProducts?: UserProducts;
+  router: ProductInfoRouter;
+  existingConversation?: Conversation;
 }
 
 export default function ProductInfo({
@@ -36,7 +43,7 @@ export default function ProductInfo({
     onSuccess: () => {
       void utils.chat.getConversations.invalidate();
     }
-  });;
+  });
   const createConversationMutation = api.chat.createConversation.useMutation({
     onSuccess: () => {
       void utils.chat.getConversations.invalidate();
@@ -45,7 +52,6 @@ export default function ProductInfo({
 
   const updateProductMutation = api.products.updateProduct.useMutation({
     onSuccess: () => {
-      
       setIsEditing(false);
       void utils.products.getProductId.invalidate({ id: product.id });
     },
@@ -82,7 +88,7 @@ export default function ProductInfo({
   };
 
 
-  const handleUpdateProduct = async (editedProduct: any) => {
+  const handleUpdateProduct = async (editedProduct: UpdateProductInput) => {
     try {
       await updateProductMutation.mutateAsync({
         id: product.id,

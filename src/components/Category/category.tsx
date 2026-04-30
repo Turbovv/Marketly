@@ -1,6 +1,5 @@
 "use client";
 
-import { useParams } from "next/navigation";
 import { api } from "~/trpc/react";
 import Link from "next/link";
 import { useState } from "react";
@@ -10,11 +9,15 @@ import { ChevronRight } from "lucide-react";
 import { slugify, unslugify } from "~/utils/slug";
 import ProductCard from "~/components/Product/card/product-card";
 import { useAuth } from "~/hooks/useAuth";
-export default function Category() {
-  const params = useParams();
-  const category = unslugify(params.category as string);
-  const subcategory = params.subcategory
-    ? unslugify(params.subcategory as string)
+interface CategoryProps {
+  category: string;
+  subcategory?: string;
+}
+
+export default function Category({ category: categoryParam, subcategory: subcategoryParam }: CategoryProps) {
+  const category = unslugify(categoryParam);
+  const subcategory = subcategoryParam
+    ? unslugify(subcategoryParam)
     : undefined;
   const [sortOption, setSortOption] = useState("");
   const { isAuthenticated, userId } = useAuth();
