@@ -1,4 +1,4 @@
-import Confirm from "~/components/Confirm/confirm";
+import Confirm from "~/components/Confirm/form";
 
 export default function ConfirmPage() {
   return (
