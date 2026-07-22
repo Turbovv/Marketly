@@ -37,7 +37,7 @@
     "@types/express": "^5.0.0",
     "@types/js-cookie": "^3.0.6",
     "@uploadthing/react": "^7.3.3",
-    "axios": "^1.16.0",
+    "axios": "^1.18.0",
     "bcryptjs": "^3.0.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
